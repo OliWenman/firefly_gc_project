@@ -12,14 +12,21 @@ All input data and parmeters are now specified in this one file.
 import sys, os
 
 sys.path.append(os.path.join(os.getcwd(), "python"))
+
+os.environ["PYTHONPATH"] = os.path.join(os.getcwd(), "python")
 os.environ["FF_DIR"] = os.getcwd()
 os.environ["STELLARPOPMODELS_DIR"] = os.path.join(os.environ["FF_DIR"], "stellar_population_models")
+
+print(os.environ['FF_DIR'])
+print(os.environ['STELLARPOPMODELS_DIR'], "\n")
+print(os.environ['PYTHONPATH'])
 
 import numpy as np
 from astropy.io import fits
 import astropy.cosmology as co
-import firefly_setup as fs
 import firefly_models as fm
+import firefly_setup as fs
+
 import time
 
 t0=time.time()
@@ -27,10 +34,12 @@ cosmo = co.Planck15
 
 #input file with path to read in wavelength, flux and flux error arrays
 #the example is for an ascii file with extension 'ascii'
-input_file = sys.argv[1]
 #input_file='example_data/spec-0266-51602-0001.fits'
+input_file='./usher_r2000/NGC0104_2015-01-30.fits'
 hdul = fits.open(input_file)
 suffix = ""		
+
+print(hdul[0].data)
 
 #redshift
 redshift = hdul[2].data['Z'][0]
@@ -38,14 +47,13 @@ redshift = hdul[2].data['Z'][0]
 wavelength = 10**hdul[1].data['loglam']
 flux = hdul[1].data['flux']
 error = hdul[1].data['ivar']**(-0.5)
+restframe_wavelength = wavelength/(1+redshift)
 
 # RA and DEC
 ra=hdul[0].header['RA'] ; dec=hdul[0].header['DEC']
 
 #velocity dispersion in km/s
 vdisp = hdul[2].data['VDISP'][0]
-
-restframe_wavelength = wavelength/(1+redshift)
 
 #instrumental resolution
 r_instrument = np.zeros(len(wavelength))

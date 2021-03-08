@@ -201,6 +201,7 @@ class StellarPopulationModel:
 
 			# Constructs the metallicity array of models :
 			all_metal_files = sorted(glob.glob(model_path+'*'))
+			#print(all_metal_files)
 			#print(model_path)
 			#print(all_metal_files)
 			#stop	

@@ -1,0 +1,12 @@
+*.tar.gz
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.s100
+
+.DS_Store

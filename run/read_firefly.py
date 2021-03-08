@@ -5,10 +5,13 @@ import numpy as np
 import sys
 
 hdul = fits.open(sys.argv[1])
+#hdul = fits.open("/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/spFly-spec-0266-51602-0001.fits")
 data=hdul[1].data
 wave = data['wavelength']
 flux = data['original_data']
 model = data['firefly_model']
+flux_error = data['flux_error']
+
 hdul.close()
 hdul.info()
 
@@ -33,6 +36,7 @@ print('E(B-V): '+str(np.around(hdul[1].header['EBV'],decimals=2))+' mag')
 
 py.plot(wave,flux)
 py.plot(wave,model)
+py.fill_between(wave, flux - flux_error, flux + flux_error, alpha = 0.5)
 py.show()
 
 fig1=py.figure()

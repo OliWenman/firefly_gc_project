@@ -1,4 +1,3 @@
-
 """
 .. moduleauthor:: Daniel Thomas <daniel.thomas__at__port.ac.uk>
 .. contributions:: Johan Comparat <johan.comparat__at__gmail.com>
@@ -32,18 +31,24 @@ input_file = sys.argv[1]
 hdul = fits.open(input_file)
 suffix = ""		
 
-#redshift
-redshift = hdul[2].data['Z'][0]
+cdelt1 = hdul[2].header['CDELT1'] #change in wavelength between pixels
+crval1 = hdul[2].header['CRVAL1'] #Starting wavelength  
+crval2 = hdul[2].header['CRVAL2'] #End wavelength
 
-wavelength = 10**hdul[1].data['loglam']
-flux = hdul[1].data['flux']
-error = hdul[1].data['ivar']**(-0.5)
+#create wavelength array
+wavelength = np.arange(crval1, crval2, cdelt1)  
+flux = hdul[2].data   
+error = hdul[1].data
 
-# RA and DEC
-ra=hdul[0].header['RA'] ; dec=hdul[0].header['DEC']
+#Reformat it to correct shape to make it comptable  
+wavelength = wavelength.reshape((-1,))
+flux       = flux.reshape((-1,))
+error      = flux.reshape((-1,))
 
-#velocity dispersion in km/s
-vdisp = hdul[2].data['VDISP'][0]
+redshift = hdul[0].header['redshift']
+ra       = hdul[0].header['ra']
+dec      = hdul[0].header['dec']
+vdisp    = hdul[0].header['veldisp']
 
 restframe_wavelength = wavelength/(1+redshift)
 
@@ -55,7 +60,7 @@ for wi,w in enumerate(wavelength):
 # masking emission lines
 # defines size of mask in pixels
 # set to value>0 for masking (20 recommended), otherwise 0
-N_angstrom_masked=0
+N_angstrom_masked=20
 # set wavelength bins to be masked
 emlines = [
 						'He-II',# 'He-II:  3202.15A, 4685.74'
@@ -79,12 +84,14 @@ emlines = [
 						]
 
 # choose model: 'm11', 'MaStar')
-model_key='MaStar'
+#model_key='MaStar'
+model_key='m11'
 
 #model flavour
 # m11: 'MILES', 'STELIB', 'ELODIE', 'MARCS (kr IMF only)'
 # MaStar: 'Th-MaStar', 'E-MaStar'
-model_lib=['E-MaStar']
+#model_lib=['E-MaStar']
+model_lib=['MILES']
 
 # choose IMF: 'kr' (Kroupa), 'ss' (Salpeter)
 imfs=['kr']
@@ -199,4 +206,3 @@ if did_not_converge < 1 :
 print()
 print ("Done... total time:", int(time.time()-t0) ,"seconds.")
 print()
-
