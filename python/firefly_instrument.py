@@ -1606,7 +1606,7 @@ def downgrade(wave, flux, deltal_in, sigma_galaxy, wave_instrument, r_instrument
 		sres    = deltal_in
 	else:
 		print('Unrecognised data type of delta l.')
-		
+
 	new_sig     = np.zeros(wave.shape, dtype=np.float64)
 	# match wavelength between model and instrument to downgrade
 	def find_nearest(array,value):

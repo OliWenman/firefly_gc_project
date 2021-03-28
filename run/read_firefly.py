@@ -3,55 +3,65 @@ from astropy.io import fits
 import matplotlib.pyplot as py
 import numpy as np
 import sys
+import os
 
-hdul = fits.open(sys.argv[1])
-#hdul = fits.open("/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/spFly-spec-0266-51602-0001.fits")
-data=hdul[1].data
-wave = data['wavelength']
-flux = data['original_data']
-model = data['firefly_model']
-flux_error = data['flux_error']
+print("Opening file...")
 
-hdul.close()
-hdul.info()
+with fits.open(sys.argv[1], memmap=True) as hdul:
+	
+	print("Opened, now loading in data")
+	#hdul = fits.open("/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/spFly-spec-0266-51602-0001.fits")
+	data       = hdul[1].data
+	wave       = data['wavelength']
+	flux       = data['original_data']
+	model      = data['firefly_model']
+	flux_error = data['flux_error']
 
-csp_age=np.ndarray(hdul[1].header['ssp_number'])
-csp_Z=np.ndarray(hdul[1].header['ssp_number'])
-csp_light=np.ndarray(hdul[1].header['ssp_number'])
-csp_mass=np.ndarray(hdul[1].header['ssp_number'])
-for i in range(len(csp_age)):
-	csp_age[i]=hdul[1].header['log_age_ssp_'+str(i)]
-	csp_Z[i]=hdul[1].header['metal_ssp_'+str(i)]
-	csp_light[i]=hdul[1].header['weightLight_ssp_'+str(i)]
-	csp_mass[i]=hdul[1].header['weightMass_ssp_'+str(i)]
+	hdul.info()
 
-print()
-print(hdul[0].header)
-print(hdul[1].header)
-print()
-print('age: '+str(np.around(10**hdul[1].header['age_lightW'],decimals=2))+' Gyr')
-print('[Z/H]: '+str(np.around(hdul[1].header['metallicity_lightW'],decimals=2))+' dex')
-print('log M/Msun: '+str(np.around(hdul[1].header['stellar_mass'],decimals=2)))
-print('E(B-V): '+str(np.around(hdul[1].header['EBV'],decimals=2))+' mag')
+	csp_age   = np.ndarray(hdul[1].header['ssp_number'])
+	csp_Z     = np.ndarray(hdul[1].header['ssp_number'])
+	csp_light = np.ndarray(hdul[1].header['ssp_number'])
+	csp_mass  = np.ndarray(hdul[1].header['ssp_number'])
 
-py.plot(wave,flux)
-py.plot(wave,model)
-py.fill_between(wave, flux - flux_error, flux + flux_error, alpha = 0.5)
-py.show()
+	for i in range(len(csp_age)):
+		csp_age[i]   = hdul[1].header['log_age_ssp_'+str(i)]
+		csp_Z[i]     = hdul[1].header['metal_ssp_'+str(i)]
+		csp_light[i] = hdul[1].header['weightLight_ssp_'+str(i)]
+		csp_mass[i]  = hdul[1].header['weightMass_ssp_'+str(i)]
 
-fig1=py.figure()
-py.xlim(0,15)
-py.xlabel('lookback time (Gyr)')
-py.ylabel('frequency')
-#py.bar(10**(csp_age),csp_light,width=1,align='center',edgecolor='k',linewidth=2)
-py.bar(10**(csp_age),csp_light,width=1,align='center',alpha=0.5)
-py.scatter(10**(csp_age),csp_light)
+	print()
+	print(hdul[0].header)
+	print(hdul[1].header)
+	print()
+	print('age: '+str(np.around(10**hdul[1].header['age_lightW'], decimals=2))+' Gyr')
+	print('[Z/H]: '+str(np.around(hdul[1].header['metallicity_lightW'], decimals=2))+' dex')
+	print('log M/Msun: '+str(np.around(hdul[1].header['stellar_mass'], decimals=2)))
+	print('E(B-V): '+str(np.around(hdul[1].header['EBV'], decimals=2))+' mag')
 
-fig2=py.figure()
-py.xlim(-2,0.5)
-py.xlabel('[Z/H] (dex)')
-py.ylabel('frequency')
-#py.bar(10**(csp_age),csp_light,width=1,align='center',edgecolor='k',linewidth=2)
-py.bar(csp_Z,csp_light,width=0.1,align='center',alpha=0.5)
-py.scatter(csp_Z,csp_light)
-py.show()
+	name = hdul[0].header['FILE']
+	py.plot(wave,flux, label = name)
+	py.plot(wave,model, label = os.path.dirname(sys.argv[1]))#hdul[0].header['MODELS'] + "_" + )
+	#py.ylim(0, 1.1)
+	py.legend()
+	py.show()
+
+	fig1 = py.figure()
+	py.xlim(0,15)
+	py.xlabel('lookback time (Gyr)')
+	py.ylabel('frequency')
+	#py.bar(10**(csp_age),csp_light,width=1,align='center',edgecolor='k',linewidth=2)
+	py.bar(10**(csp_age), csp_light, width=1, align='center', alpha=0.5)
+	py.scatter(10**(csp_age), csp_light)
+
+	fig2 = py.figure()
+	py.xlim(-2, 0.5)
+	py.xlabel('[Z/H] (dex)')
+	py.ylabel('frequency')
+	#py.bar(10**(csp_age),csp_light,width=1,align='center',edgecolor='k',linewidth=2)
+	py.bar(csp_Z,csp_light, width=0.1, align='center', alpha=0.5)
+	py.scatter(csp_Z,csp_light)
+	py.show()
+
+
+print("Closed file")

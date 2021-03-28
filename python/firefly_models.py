@@ -131,8 +131,32 @@ class StellarPopulationModel:
 			hdul=pyfits.open(model_path+'/MaStar_SSP_'+ver+'.fits.gz')
 			r_model=hdul[2].data[1,:]
 			# This provides R=lamba/delta_lambda as numpy ndarray. The params deltal_libs and deltal should probably be renamed. 
+			#print(r_model)
+			#print(r_model.shape)
+			#sys.exit()
+
 			self.deltal_libs.append(r_model)
-			
+		
+		elif self.models.upper() == "CONROY":
+
+			for m in self.model_libs:
+				
+				"""
+				All model flavours are smoothed to a common dispersion of 100[km/s]
+
+				sigma = 100[km/s]
+				R = c/(2.335*sigma) = 3*10**5[km/s]/(2.35*100[km/s]) = 1273.88
+				
+				Number of wavlength points for Conroy = 10566
+				"""	
+				n_points = 10566
+				r        = 3*10**5/(2.35*100)
+				r_model  = np.full((n_points, ), r)
+
+				self.deltal_libs.append(r_model)
+				
+				#self.deltal_libs.append(4.31)
+
 		# sets the Initial mass function
 		self.imfs = imfs
 		self.hpf_mode = hpf_mode
@@ -152,218 +176,6 @@ class StellarPopulationModel:
 		self.data_wave_medium = data_wave_medium
 		self.Z_limits = Z_limits
 		self.wave_limits = wave_limits
-
-	def get_model(self, model_used, imf_used, deltal, vdisp, wave_instrument, r_instrument, ebv_mw):
-		"""
-		Retrieves all relevant model files, in their downgraded format.
-		If they aren't downgraded to the correct resolution / velocity dispersion,
-		takes the base models in their native form and converts to downgraded files.
-
-		:param model_used: list of models to be used, for example ['m11', 'm09'].
-		:param imf_used: list of imf to be used, for example ['ss', 'kr'].
-		:param deltal: delta lambda in the models.
-		:param vdisp: velocity dispersion observed in the galaxy.
-		:param wave_instrument: wavelength array from the observations
-		:param r_instrument: resolution array from the observations
-		:param  ebv_mw: E(B-V) from the dust maps for the galaxy.
-
-		Workflow
-		----------
-			A. loads the models m11 or MaStar: maps parameters to the right files. Then it constructs the model array. Finally converts wavelengths to air or vacuum.
-			B. downgrades the model to match data resolution
-			C. applies attenuation
-			D. stores models in
-				self.model_wavelength,
-				self.model_flux,
-				self.age_model,
-				self.metal_model
-
-			and returns it as well
-
-		"""
-		# first the m11 case
-		if self.models == 'm11':
-			first_file  = True
-			model_files = []
-			#print('yes we are in here')
-			#stop
-#			if self.use_downgraded_models :
-#				if model_used == 'MILES_UVextended' or model_used == 'MILES_revisedIRslope':
-#					model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_MILES_downgraded','ssp_M11_' + model_used+ '.' + imf_used)
-#				else:
-#					model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_'+ model_used + '_downgraded', 'ssp_M11_' +model_used +'.' + imf_used)
-#			else:
-#				if model_used == 'MILES_UVextended' or model_used == 'MILES_revisedIRslope':
-#					model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_MILES', 'ssp_M11_'+model_used+'.'+imf_used)
-#				else:
-			model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_'+model_used ,'ssp_M11_' +model_used +'.' + imf_used)
-
-
-			# Constructs the metallicity array of models :
-			all_metal_files = sorted(glob.glob(model_path+'*'))
-			#print(all_metal_files)
-			#print(model_path)
-			#print(all_metal_files)
-			#stop	
-			## # print all_metal_files
-			metal_files 	= []
-			metal 	    = [] #[-2.25, -1.35, -0.33, 0, 0.35]
-			for z in range(len(all_metal_files)):
-				zchar = all_metal_files[z][len(model_path):]
-				if zchar == 'z001':
-					#znum = -0.3
-					znum = 10**(-0.33) #0.5
-				elif zchar == 'z002':
-					#znum = 0.0
-					znum = 10**(0) #1.0
-				elif zchar == 'z004':
-					#znum = 0.3
-					znum = 10**(0.35) #2.0
-				elif zchar == 'z0001.bhb':
-					#znum = -1.301
-					znum = 10**(-1.35) #10**-1.301
-				elif zchar == 'z0001.rhb':
-					#znum = -1.302
-					znum = 10**(-1.35) #10**-1.302
-				elif zchar == 'z10m4.bhb':
-					#znum = -2.301
-					znum = 10**(-2.25) #10**-2.301
-				elif zchar == 'z10m4.rhb':
-					#znum = -2.302
-					znum = 10**(-2.25) #10**-2.302
-				elif zchar == 'z10m4':
-					#znum = -2.300
-					znum = 10**(-2.25) #10**-2.300
-				elif zchar == 'z-0.6':
-					znum = 10**-0.6
-				elif zchar == 'z-0.9':
-					znum = 10**-0.9
-				elif zchar == 'z-1.2':
-					znum = 10**-1.2
-				elif zchar == 'z-1.6':
-					znum = 10**-1.6
-				elif zchar == 'z-1.9':
-					znum = 10**-1.9
-				else:
-					raise NameError('Unrecognised metallicity! Check model file names.')
-
-				if znum>10**(self.Z_limits[0]) and znum<10**(self.Z_limits[1]):
-					metal_files.append(all_metal_files[z])
-					metal.append(znum)
-			#print(metal_files)
-			#stop
-			# constructs the model array
-			model_flux, age_model, metal_model = [],[],[]
-			for zi,z in enumerate(metal_files):
-				# print "Retrieving and downgrading models for "+z
-				model_table = pd.read_table(z,converters={'Age':np.float64}, header=None ,usecols=[0,2,3], names=['Age','wavelength_model','flux_model'], delim_whitespace=True)
-				age_data = np.unique(model_table['Age'].values.ravel())
-#				print(age_data)
-#				stop
-				for a in age_data:
-					logyrs_a = trylog10(a)+9.0
-					## print "age model selection:", self.age_limits[0], logyrs_a, self.age_limits[1]
-					if (((10**(logyrs_a-9)) < self.age_limits[0]) or ((10**(logyrs_a-9)) > self.age_limits[1])):
-						continue
-					else:
-						spectrum = model_table.loc[model_table.Age == a, ['wavelength_model', 'flux_model'] ].values
-						wavelength_int,flux = spectrum[:,0],spectrum[:,1]
-
-						# converts to air wavelength
-						if self.data_wave_medium == 'vacuum':
-							wavelength = airtovac(wavelength_int)
-						else:
-							wavelength = wavelength_int
-
-						# downgrades the model
-						if self.downgrade_models:
-							mf = downgrade(wavelength,flux,deltal,self.vdisp_round, wave_instrument, r_instrument)
-						else:
-							mf = copy.copy(flux)
-
-						# Reddens the models
-						if ebv_mw != 0:
-							attenuations = unred(wavelength,ebv=0.0-ebv_mw)
-							model_flux.append(mf*attenuations)
-						else:
-							model_flux.append(mf)
-
-						age_model.append(a)
-						metal_model.append(metal[zi])
-						first_model = False
-			#print(wavelength)
-			#stop
-
-			# print "Retrieved all models!"
-			self.model_wavelength, self.model_flux, self.age_model, self.metal_model = wavelength, model_flux, age_model, metal_model
-			return wavelength, model_flux, age_model, metal_model
-
-		elif self.models =='MaStar':
-			
-			model_path = os.environ['STELLARPOPMODELS_DIR']
-			ver = 'v0.2'
-			
-			lib = model_used
-			if imf_used == 'kr':
-				slope = 1.3
-			elif imf_used == 'ss':
-				slope = 2.35
-			else:
-				print('Unrecognised IMF. Please choose between kr and ss')
-				sys.exit()
-				
-			#print('IMF slope used: '+str(slope))
-			
-			hdul=pyfits.open(model_path+'/MaStar_SSP_'+ver+'.fits.gz')
-
-			t=hdul[1].data[:,0,0,0]
-			Z=hdul[1].data[0,:,0,1]
-			s=hdul[1].data[0,0,:,2]
-			#wavelength=hdul[2].data
-
-
-			wavelength=hdul[2].data[0,:]
-
-			if (lib=='Th-MaStar'):
-				fluxgrid=hdul[3].data
-			if (lib=='E-MaStar'):
-				fluxgrid=hdul[4].data
-				
-			sidx = np.where(s==slope)[0][0]
-			
-			model_flux, age_model, metal_model = [],[],[]
-			for ii,age in enumerate(t):
-				if ((age < self.age_limits[0]) or (age > self.age_limits[1])):
-					continue
-				for jj,metal in enumerate(Z):
-					if ((metal<self.Z_limits[0]) or (metal>self.Z_limits[1])):
-						continue
-					if (metal<-1.35 and age<1):
-						continue
-					flux = fluxgrid[ii,jj,sidx,:]
-					
-					# no conversion to vacuum needed, assuming models are in vacuum
-					
-					# downgrades the model
-					if self.downgrade_models:
-						mf = downgrade(wavelength,flux,deltal,self.vdisp_round, wave_instrument, r_instrument)
-					else:
-						mf = copy.copy(flux)
-					
-					# Reddens the models
-					if ebv_mw != 0:
-						attenuations = unred(wavelength,ebv=0.0-ebv_mw)
-						model_flux.append(mf*attenuations)
-					else:
-						model_flux.append(mf)
-					
-					age_model.append(age)
-					metal_model.append(10**metal)
-					
-			#print("Retrieved all models!")
-			self.model_wavelength, self.model_flux, self.age_model, self.metal_model = wavelength, model_flux, age_model, metal_model
-			return wavelength, model_flux, age_model, metal_model
-		
 		
 
 	def fit_models_to_data(self):
@@ -374,14 +186,23 @@ class StellarPopulationModel:
 		 #. normalises the spectra
 		"""
 		t_i = time.time()
-		print( "getting the models, t=", t_i )
+		
 		for mi,mm in enumerate(self.model_libs):
+
 			# loop over the models
 			for ii in self.imfs:
+
 				# loop over the IMFs
 				# A. gets the models
 				deltal = self.deltal_libs[mi]
-				model_wave_int, model_flux_int, age, metal = self.get_model( mm, ii, deltal, self.specObs.vdisp, self.specObs.restframe_wavelength, self.specObs.r_instrument, self.specObs.ebv_mw)
+
+				model_wave_int, model_flux_int, age, metal = self.get_model(model_used      = mm, 
+																			imf_used        = ii, 
+																			deltal          = deltal, 
+																			vdisp           = self.specObs.vdisp, 
+																			wave_instrument = self.specObs.restframe_wavelength, 
+																			r_instrument    = self.specObs.r_instrument, 
+																			ebv_mw          = self.specObs.ebv_mw)
 				# B. matches the model and data to the same resolution
 				#print( "Matching models to data" )
 				#print("data: w,f,b,fe", len(self.specObs.restframe_wavelength), len(self.specObs.flux), len(self.specObs.bad_flags), len(self.specObs.error) )
@@ -690,6 +511,350 @@ class StellarPopulationModel:
 			else :
 				return 0.
 
+	def get_model(self, model_used, imf_used, deltal, vdisp, wave_instrument, r_instrument, ebv_mw):
+		"""
+		Retrieves all relevant model files, in their downgraded format.
+		If they aren't downgraded to the correct resolution / velocity dispersion,
+		takes the base models in their native form and converts to downgraded files.
+
+		:param model_used: list of models to be used, for example ['m11', 'm09'].
+		:param imf_used: list of imf to be used, for example ['ss', 'kr'].
+		:param deltal: delta lambda in the models.
+		:param vdisp: velocity dispersion observed in the galaxy.
+		:param wave_instrument: wavelength array from the observations
+		:param r_instrument: resolution array from the observations
+		:param  ebv_mw: E(B-V) from the dust maps for the galaxy.
+
+		Workflow
+		----------
+			A. loads the models m11 or MaStar: maps parameters to the right files. Then it constructs the model array. Finally converts wavelengths to air or vacuum.
+			B. downgrades the model to match data resolution
+			C. applies attenuation
+			D. stores models in
+				self.model_wavelength,
+				self.model_flux,
+				self.age_model,
+				self.metal_model
+
+			and returns it as well
+
+		"""
+		print("Reading models...")
+
+		# first the m11 case
+		if self.models == 'm11':
+			first_file  = True
+			model_files = []
+			#print('yes we are in here')
+			#stop
+#			if self.use_downgraded_models :
+#				if model_used == 'MILES_UVextended' or model_used == 'MILES_revisedIRslope':
+#					model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_MILES_downgraded','ssp_M11_' + model_used+ '.' + imf_used)
+#				else:
+#					model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_'+ model_used + '_downgraded', 'ssp_M11_' +model_used +'.' + imf_used)
+#			else:
+#				if model_used == 'MILES_UVextended' or model_used == 'MILES_revisedIRslope':
+#					model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_MILES', 'ssp_M11_'+model_used+'.'+imf_used)
+#				else:
+			model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_'+model_used ,'ssp_M11_' +model_used +'.' + imf_used)
+
+
+			# Constructs the metallicity array of models :
+			all_metal_files = sorted(glob.glob(model_path+'*'))
+			#print(all_metal_files)
+			#print(model_path)
+			#print(all_metal_files)
+			#stop	
+			## # print all_metal_files
+			metal_files 	= []
+			metal 	    = [] #[-2.25, -1.35, -0.33, 0, 0.35]
+			for z in range(len(all_metal_files)):
+				zchar = all_metal_files[z][len(model_path):]
+				if zchar == 'z001':
+					#znum = -0.3
+					znum = 10**(-0.33) #0.5
+				elif zchar == 'z002':
+					#znum = 0.0
+					znum = 10**(0) #1.0
+				elif zchar == 'z004':
+					#znum = 0.3
+					znum = 10**(0.35) #2.0
+				elif zchar == 'z0001.bhb':
+					#znum = -1.301
+					znum = 10**(-1.35) #10**-1.301
+				elif zchar == 'z0001.rhb':
+					#znum = -1.302
+					znum = 10**(-1.35) #10**-1.302
+				elif zchar == 'z10m4.bhb':
+					#znum = -2.301
+					znum = 10**(-2.25) #10**-2.301
+				elif zchar == 'z10m4.rhb':
+					#znum = -2.302
+					znum = 10**(-2.25) #10**-2.302
+				elif zchar == 'z10m4':
+					#znum = -2.300
+					znum = 10**(-2.25) #10**-2.300
+				elif zchar == 'z-0.6':
+					znum = 10**-0.6
+				elif zchar == 'z-0.9':
+					znum = 10**-0.9
+				elif zchar == 'z-1.2':
+					znum = 10**-1.2
+				elif zchar == 'z-1.6':
+					znum = 10**-1.6
+				elif zchar == 'z-1.9':
+					znum = 10**-1.9
+				else:
+					raise NameError('Unrecognised metallicity! Check model file names.')
+
+				if znum>10**(self.Z_limits[0]) and znum<10**(self.Z_limits[1]):
+					metal_files.append(all_metal_files[z])
+					metal.append(znum)
+			#print(metal_files)
+			#stop
+			# constructs the model array
+			model_flux, age_model, metal_model = [],[],[]
+			for zi,z in enumerate(metal_files):
+				# print "Retrieving and downgrading models for "+z
+				model_table = pd.read_table(z,converters={'Age':np.float64}, header=None ,usecols=[0,2,3], names=['Age','wavelength_model','flux_model'], delim_whitespace=True)
+				age_data = np.unique(model_table['Age'].values.ravel())
+				#print(age_data)
+#				stop
+				for a in age_data:
+					logyrs_a = trylog10(a)+9.0
+					## print "age model selection:", self.age_limits[0], logyrs_a, self.age_limits[1]
+					if (((10**(logyrs_a-9)) < self.age_limits[0]) or ((10**(logyrs_a-9)) > self.age_limits[1])):
+						continue
+					else:
+						spectrum = model_table.loc[model_table.Age == a, ['wavelength_model', 'flux_model'] ].values
+						wavelength_int,flux = spectrum[:,0],spectrum[:,1]
+
+						# converts to air wavelength
+						if self.data_wave_medium == 'vacuum':
+							wavelength = airtovac(wavelength_int)
+						else:
+							wavelength = wavelength_int
+
+						# downgrades the model
+						if self.downgrade_models:
+							mf = downgrade(wavelength,flux,deltal,self.vdisp_round, wave_instrument, r_instrument)
+						else:
+							mf = copy.copy(flux)
+
+						# Reddens the models
+						if ebv_mw != 0:
+							attenuations = unred(wavelength,ebv=0.0-ebv_mw)
+							model_flux.append(mf*attenuations)
+						else:
+							model_flux.append(mf)
+
+						age_model.append(a)
+						metal_model.append(metal[zi])
+						first_model = False
+			#print(wavelength)
+			#stop
+
+			# print "Retrieved all models!"
+			self.model_wavelength, self.model_flux, self.age_model, self.metal_model = wavelength, model_flux, age_model, metal_model
+
+			#print(wavelength, "\n")
+			#print(model_flux, "\n")
+			#print(age_model, "\n")
+			#print(metal_model, "\n")
+
+		elif self.models =='MaStar':
+			
+			model_path = os.environ['STELLARPOPMODELS_DIR']
+			ver = 'v0.2'
+			
+			lib = model_used
+			if imf_used == 'kr':
+				slope = 1.3
+			elif imf_used == 'ss':
+				slope = 2.35
+			else:
+				print('Unrecognised IMF. Please choose between kr and ss')
+				sys.exit()
+				
+			#print('IMF slope used: '+str(slope))
+			
+			hdul=pyfits.open(model_path+'/MaStar_SSP_'+ver+'.fits.gz')
+
+			t=hdul[1].data[:,0,0,0]
+			Z=hdul[1].data[0,:,0,1]
+			s=hdul[1].data[0,0,:,2]
+			#wavelength=hdul[2].data
+
+
+			wavelength=hdul[2].data[0,:]
+
+			if (lib=='Th-MaStar'):
+				fluxgrid=hdul[3].data
+			if (lib=='E-MaStar'):
+				fluxgrid=hdul[4].data
+				
+			sidx = np.where(s==slope)[0][0]
+			
+			model_flux, age_model, metal_model = [],[],[]
+			for ii,age in enumerate(t):
+				if ((age < self.age_limits[0]) or (age > self.age_limits[1])):
+					continue
+				for jj,metal in enumerate(Z):
+					if ((metal<self.Z_limits[0]) or (metal>self.Z_limits[1])):
+						continue
+					if (metal<-1.35 and age<1):
+						continue
+					flux = fluxgrid[ii,jj,sidx,:]
+					
+					# no conversion to vacuum needed, assuming models are in vacuum
+					
+					# downgrades the model
+					if self.downgrade_models:
+						mf = downgrade(wavelength,flux,deltal,self.vdisp_round, wave_instrument, r_instrument)
+					else:
+						mf = copy.copy(flux)
+					
+					# Reddens the models
+					if ebv_mw != 0:
+						attenuations = unred(wavelength,ebv=0.0-ebv_mw)
+						model_flux.append(mf*attenuations)
+					else:
+						model_flux.append(mf)
+					
+					age_model.append(age)
+					metal_model.append(10**metal)
+					
+			#print("Retrieved all models!")
+			self.model_wavelength, self.model_flux, self.age_model, self.metal_model = wavelength, model_flux, age_model, metal_model
+
+		#Conroy models
+		elif self.models.upper() == "CONROY":
+
+			if model_used != "E-CONROY": #and model_used != "Th":
+				raise NameError("Unrecognised model_lib!")
+			
+			#Join path together to find needed files.
+
+			model_path = os.path.join(os.environ['STELLARPOPMODELS_DIR'],'SPP_CONROY', "E") #,'VCJ_v8_mcut0.08_')
+
+			#Used a different method, because all files will be used as it is not dependent on IMF as you select the IMF spectra to use inside the file.
+			all_metal_files = [f for f in os.listdir(model_path) if os.path.isfile(os.path.join(model_path, f))]	
+
+			
+			metal_files = []
+			metal 	    = []
+
+			"""
+			Get the metalicility from the file names, similiar to m11. 
+			
+			"""
+			for z in range(len(all_metal_files)):
+				
+				zchar = all_metal_files[z][len("VCJ_v8_mcut0.08_") + 6: len(".ssp.imf_varydoublex.s100") +2]
+
+				if zchar == 'Zm0.5':
+					znum = 10**(-0.5) 
+
+				elif zchar == 'Zm1.0':
+					znum = 10**(-1.0)
+
+				elif zchar == 'Zm1.5':
+					znum = 10**(-1.5) 
+
+				elif zchar == 'Zp0.0':
+					znum = 10**(0) 
+
+				elif zchar == 'Zp0.2':
+					znum = 10**(0.2) 
+
+				else:
+					raise NameError('Unrecognised metallicity! Check model file names.')
+
+				if znum>10**(self.Z_limits[0]) and znum<10**(self.Z_limits[1]):
+					metal_files.append(all_metal_files[z])
+					metal.append(znum)
+
+			model_flux, age_model, metal_model = [],[],[]
+
+
+			for zi,z in enumerate(metal_files):
+
+				#IMF IS LOCATED INSIDE THE FILE NOT THE FILENAME.
+				#Select the correct spectra columns to use dependent on imf selected (0 is the wavelength, the other 256 spectra are IMF dependent )		
+				if imf_used == 'kr': 
+
+					usecols = [0, 74]
+					names    = ["wavelength", "flux1"] 
+
+				elif imf_used == 'ss':
+
+					usecols = [0, 154] 
+					names    = ["wavelength", "flux1"]
+				else:
+					#Open to add more IMF options for selected spectra if needed
+					raise NameError("Unrecognised IMF!")
+
+				#Read in the data using the selected columns
+				model_table = pd.read_table(os.path.join(model_path, z), 
+											usecols         = usecols,
+											names           = names,
+											header          = None, 
+											delim_whitespace= True)
+				
+				#Get the number of spectra that are used
+				n_spec = len(model_table.columns) -1
+
+				#Get the age values from the filename, same as M11
+				a = float(z[len("VCJ_v8_mcut0.08_t") : len(".ssp.imf_varydoublex.s100") - 6])
+
+
+				#Loop through the number of spectra 
+				for s in range(n_spec):
+
+					logyrs_a = trylog10(a)+9.0
+
+					if (((10**(logyrs_a-9)) < self.age_limits[0]) or ((10**(logyrs_a-9)) > self.age_limits[1])):
+						continue
+
+					else:
+						
+						#Get the wavelength values
+						wavelength_int = model_table["wavelength"].values
+
+						#Get the selected flux in the loop
+						flux = model_table["flux" + str(s + 1)].values
+
+						# converts to air wavelength
+						if self.data_wave_medium == 'vacuum':
+							wavelength = airtovac(wavelength_int)
+						else:
+							wavelength = wavelength_int
+
+						# downgrades the model
+						if self.downgrade_models:
+
+							mf = downgrade(wavelength, flux,deltal, self.vdisp_round, wave_instrument, r_instrument)
+						else:
+							mf = copy.copy(flux)
+
+						# Reddens the models
+						if ebv_mw != 0:
+
+							attenuations = unred(wavelength, ebv=0.0-ebv_mw)
+							model_flux.append(mf*attenuations)
+							#model_flux.append(mf)
+						else:
+							model_flux.append(mf)
+
+						age_model.append(a)
+						metal_model.append(metal[zi])
+						first_model = False
+
+			self.model_wavelength, self.model_flux, self.age_model, self.metal_model = wavelength, model_flux, age_model, metal_model
+
+		print("Models retrieved!")
+
+		return wavelength, model_flux, age_model, metal_model
 
 	def create_dummy_hdu(self):
 		"""

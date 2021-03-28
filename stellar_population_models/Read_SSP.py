@@ -23,7 +23,11 @@ flux       = model_table.iloc[:, -1]
 
 #print(model_table)
 print(wavelength)
-print(flux)
+print(model_table)
+
+model_table.insert(0, "age", [age]*10565, True)
+
+print(model_table) 
 
 #plt.plot(wavelength[0: 6000], flux[0:6000])
 plt.plot(wavelength, flux)

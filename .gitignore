@@ -7,6 +7,18 @@
 *.rar
 *.tar
 *.zip
+*.fits
+*.s100
+*.dat
+!MaStar_SSP_v0.2.fits.gz
+!output/CONROY_E_KR/
+!output/MASTAR_E_KR/
+!output/MASTAR_E_V0.2_KR/
+!output/MASTAR_TH_KR/
+!output/MASTAR_TH_V0.2_KR/
+!output/dissertation/
+stellar_population_models/SSP_CONROY/
+
 
 
 .DS_Store
