@@ -2,7 +2,7 @@ from astropy.io import fits
 import numpy as np
 import os
 
-dissertation_results = False
+dissertation_results = True
 MASTAR_VERSION      = "v0.2"
 """
 input_file      = [
@@ -19,9 +19,10 @@ ask_to_override     = False
 write_results       = True
 
 # choose model: 'm11', 'MaStar', 'CONROY'
-model_key = 'CONROY'
-model_lib = ['E-CONROY'] 
+model_key = 'MaStar'
+model_lib = ['Th-MaStar'] 
 imfs      = ['kr']
+downgrade_to_conroy = True
 
 r_instrument_value = 2000 
 
@@ -72,12 +73,12 @@ max_iterations        = 10
 pdf_sampling          = 300  
 
 ############################################################################################################
-
+"""
 if model_key.upper() == "CONROY":
     downgrade_to_conroy = True
 else:
     downgrade_to_conroy = False
-
+"""
 directory = model_key
 
 for mod_lib in model_lib:

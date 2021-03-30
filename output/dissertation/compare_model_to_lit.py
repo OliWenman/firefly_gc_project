@@ -31,12 +31,19 @@ if __name__ == "__main__":
 
 	paths = [
 		"output/dissertation/MASTAR_TH_V0.2_KR",
+		"output/dissertation/MASTAR_TH_V0.2_KR/downgraded",
 		"output/dissertation/MASTAR_E_V0.2_KR",
+		"output/dissertation/MASTAR_E_V0.2_KR/downgraded",
 		"output/dissertation/CONROY_E_KR/downgraded",
 	]
 
 	#Loop through the model data
 	for path in paths:
+
+		if path.split('/')[-1] == "downgraded" and not "CONROY" in path.split('/')[-2]:
+			downgraded_to_conroy = "(downgraded)"
+		else:
+			downgraded_to_conroy = ""
 	 
 	 	#Get every file in the path of the folder and store in a list
 		files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
@@ -89,22 +96,33 @@ if __name__ == "__main__":
 					lit_age   = float(lit_values['Age'])
 					lit_metal = float(lit_values['[Fe/H]'])
 				
+				#DeAngeli_GB and HST have 2 values for metal and age. Have taken the average?
 				elif lit_file == "DeAngeli_GB.txt":
 					
-					lit_age   = float(10**lit_values['Age1'])
-					lit_metal = float(lit_values['[Fe/H]zw'])
+					lit_age1   = float(10**lit_values['Age1'])
+					lit_age2   = float(10**lit_values['Age2'])
+					lit_metal1 = float(lit_values['[Fe/H]zw'])
+					lit_metal2 = float(lit_values['[Fe/H]cg'])
 
+					lit_age   = (lit_age1 + lit_age2)/2
+					lit_metal = (lit_metal1 + lit_metal2) / 2
+					
 				elif lit_file == "DeAngeli_HST.txt":
 					
-					lit_age   = float(10**lit_values['Age1'])
-					lit_metal = float(lit_values['[Fe/H]zw'])
+					lit_age1   = float(10**lit_values['Age1'])
+					lit_age2   = float(10**lit_values['Age2'])
+					lit_metal1 = float(lit_values['[Fe/H]zw'])
+					lit_metal2 = float(lit_values['[Fe/H]cg'])
+
+					lit_age   = (lit_age1 + lit_age2)/2
+					lit_metal = (lit_metal1 + lit_metal2) / 2
 
 				#Extract the model data
 				hdul        = fits.open(file)
 				model_age   = float(10**hdul[1].header['age_lightW'])
 
 				model_metal = float(hdul[1].header['metallicity_lightW'])
-				model       = hdul[1].header["MODEL"]
+				model       = hdul[1].header["MODEL"] + downgraded_to_conroy
 				
 				hdul.close()
 
