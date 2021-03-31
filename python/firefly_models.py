@@ -735,11 +735,13 @@ class StellarPopulationModel:
 			
 			#Join path together to find needed files.
 
-			model_path = os.path.join(os.environ['STELLARPOPMODELS_DIR'],'SPP_CONROY', "E") #,'VCJ_v8_mcut0.08_')
+			model_path = os.path.join(os.environ['STELLARPOPMODELS_DIR'],'SSP_CONROY', "E") #,'VCJ_v8_mcut0.08_')
+
+			#all_metal_files = sorted(glob.glob(model_path+'*'))
+			#print(all_metal_files)
 
 			#Used a different method, because all files will be used as it is not dependent on IMF as you select the IMF spectra to use inside the file.
-			all_metal_files = [f for f in os.listdir(model_path) if os.path.isfile(os.path.join(model_path, f))]	
-
+			all_metal_files = [f for f in os.listdir(model_path) if os.path.isfile(os.path.join(model_path, f)) and  f.endswith('.s100')]	
 			
 			metal_files = []
 			metal 	    = []

@@ -16,16 +16,18 @@ if __name__ == "__main__":
 	#Get optinal argument to display plots.
 	#If no argument given, default is True
 	try:
-		display_plot = sys.argv[1].lower() == 'false'
+		display_plot = sys.argv[1].lower() == 'true'
 	except:
-		display_plot = True
+		display_plot = False
 
 	#Setup arrays to store calculated values
-	model_array     = []
-	lit_used_array  = []
-	parameter_array = []
-	medium_array    = []
-	sigma_array     = []
+	model_array       = []
+	lit_used_array    = []
+	parameter_array   = []
+	sample_size_array = []
+	mean_array        = []
+	medium_array      = []
+	sigma_array       = []
 
 	#Paths (relative to firefly directory) to read in the data processed by firefly
 
@@ -159,7 +161,7 @@ if __name__ == "__main__":
 			#Setup plotting options
 			columns = 4
 			rows    = len(lit_files)
-			bins = 15
+			bins    = 15
 
 			#Name figure
 			fig.suptitle("Model " + model + " compared with literature values.", fontweight='bold')
@@ -221,6 +223,15 @@ if __name__ == "__main__":
 			index = index +1
 			
 			#Calculate stats
+			sample_size = len(model_age_array)
+			print(len(model_age_array))
+			print(len(model_metal_array))
+			print(len(lit_age_array))
+			print(len(lit_metal_array))
+
+			mean_age     = np.mean(model_age_log_array - lit_age_log_array)
+			mean_metal   = np.mean(model_metal_array - lit_metal_array)
+
 			medium_age   = np.median(model_age_log_array - lit_age_log_array)
 			medium_metal = np.median(model_metal_array - lit_metal_array)
 
@@ -228,6 +239,9 @@ if __name__ == "__main__":
 			std_metal    = np.std(model_metal_array - lit_metal_array)
 
 			#Save data to arrays
+			sample_size_array.append(sample_size)
+			sample_size_array.append(sample_size)
+
 			model_array.append(model)
 			model_array.append(model)
 
@@ -237,11 +251,16 @@ if __name__ == "__main__":
 			parameter_array.append("Age (log Gyr)")
 			parameter_array.append("[Z/H]")
 
-			medium_array.append(medium_age)
-			medium_array.append(medium_metal)
+			n_decimals= 2
 
-			sigma_array.append(std_age)
-			sigma_array.append(std_metal)
+			mean_array.append(round(mean_age*100, n_decimals))
+			mean_array.append(round(mean_metal*100, n_decimals))			
+
+			medium_array.append(round(medium_age*100, n_decimals))
+			medium_array.append(round(medium_metal*100, n_decimals))
+
+			sigma_array.append(round(std_age*100, n_decimals))
+			sigma_array.append(round(std_metal*100, n_decimals))
 
 			#print("Medium Difference Age (log Gyr) =", medium_age)
 			#print("Medium Difference [Z/H]         =", medium_metal)
@@ -258,11 +277,20 @@ if __name__ == "__main__":
 			plt.show()
 
 	#Create dataframe and save the stats in a table
-	data = {'Model': model_array, 'Literature data': lit_used_array, 'Parameter':parameter_array, 'Medium difference': medium_array, 'Sigma difference': sigma_array}
+	data = {'Model': model_array, 'Literature data': lit_used_array, 'Parameter':parameter_array, 'Sample size': sample_size_array,'Mean difference(%)': mean_array,'Medium difference(%)': medium_array, 'Standard deviation difference(%)': sigma_array}
 
 	df = pd.DataFrame(data=data)
 
 	df.to_csv("output/dissertation/data/table.csv", index = False, header=True)
 
-	print(df)
+	print(df.loc[(df['Literature data'] == 'UsherGC') & (df['Parameter'] == '[Z/H]')], "\n")
+	print(df.loc[(df['Literature data'] == 'UsherGC') & (df['Parameter'] == 'Age (log Gyr)')], "\n")
+
+	print(df.loc[(df['Literature data'] == 'DeAngeli_HST') & (df['Parameter'] == '[Z/H]')], "\n")
+	print(df.loc[(df['Literature data'] == 'DeAngeli_HST') & (df['Parameter'] == 'Age (log Gyr)')], "\n")
+
+	print(df.loc[(df['Literature data'] == 'DeAngeli_GB') & (df['Parameter'] == '[Z/H]')], "\n")
+	print(df.loc[(df['Literature data'] == 'DeAngeli_GB') & (df['Parameter'] == 'Age (log Gyr)')], "\n")
+
+	#print(df)
 
