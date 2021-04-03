@@ -10,11 +10,13 @@ All input data and parmeters are now specified in this one file.
 
 import sys, os
 import warnings
+import inputs as inp
 warnings.filterwarnings("ignore")
 
 sys.path.append(os.path.join(os.getcwd(), "python"))
 os.environ["FF_DIR"] = os.getcwd()
 os.environ["STELLARPOPMODELS_DIR"] = os.path.join(os.environ["FF_DIR"], "stellar_population_models")
+os.environ["MASTAR_VERSION"]  = inp.MASTAR_VERSION
 
 import numpy as np
 import astropy.cosmology as co
@@ -27,8 +29,6 @@ from multiprocessing import Pool
 import firefly_setup as fs
 import firefly_models as fm
 from firefly_instrument import downgrade, match_spectral_resolution
-
-import inputs as inp
 
 ############################################################################################################################################################################
 #Get the user values from the input file for Firefly to use

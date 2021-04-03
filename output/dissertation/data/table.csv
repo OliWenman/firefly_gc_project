@@ -1,31 +1,19 @@
-Model,Literature data,Parameter,Sample size,Mean difference(%),Medium difference(%),σ difference(%)
-Th-MaStar,UsherGC,Age (log Gyr),81,-22.1,-24.79,44.76
-Th-MaStar,UsherGC,[Z/H],81,5.95,7.07,38.15
-Th-MaStar,DeAngeli_GB,Age (log Gyr),23,-6.16,-4.11,22.63
-Th-MaStar,DeAngeli_GB,[Z/H],23,-5.55,-0.56,33.62
-Th-MaStar,DeAngeli_HST,Age (log Gyr),36,-9.53,-4.76,25.76
-Th-MaStar,DeAngeli_HST,[Z/H],36,8.56,2.36,34.45
-Th-MaStar(downgraded),UsherGC,Age (log Gyr),81,-24.7,-27.98,53.36
-Th-MaStar(downgraded),UsherGC,[Z/H],81,10.46,14.78,41.65
-Th-MaStar(downgraded),DeAngeli_GB,Age (log Gyr),23,-11.67,-11.26,29.27
-Th-MaStar(downgraded),DeAngeli_GB,[Z/H],23,4.82,5.85,45.11
-Th-MaStar(downgraded),DeAngeli_HST,Age (log Gyr),36,-19.41,-14.11,31.4
-Th-MaStar(downgraded),DeAngeli_HST,[Z/H],36,9.46,21.76,34.09
-E-MaStar,UsherGC,Age (log Gyr),81,-25.46,-26.72,49.18
-E-MaStar,UsherGC,[Z/H],81,8.51,-0.93,55.08
-E-MaStar,DeAngeli_GB,Age (log Gyr),23,-17.58,-7.6,33.17
-E-MaStar,DeAngeli_GB,[Z/H],23,-4.95,-9.56,35.97
-E-MaStar,DeAngeli_HST,Age (log Gyr),36,-21.17,-6.82,35.12
-E-MaStar,DeAngeli_HST,[Z/H],36,10.64,-0.28,62.32
-E-MaStar(downgraded),UsherGC,Age (log Gyr),81,-26.21,-26.23,50.86
-E-MaStar(downgraded),UsherGC,[Z/H],81,14.77,8.72,54.59
-E-MaStar(downgraded),DeAngeli_GB,Age (log Gyr),23,-16.2,-4.73,32.53
-E-MaStar(downgraded),DeAngeli_GB,[Z/H],23,-1.58,0.16,38.73
-E-MaStar(downgraded),DeAngeli_HST,Age (log Gyr),36,-23.69,-11.22,35.23
-E-MaStar(downgraded),DeAngeli_HST,[Z/H],36,13.26,2.99,63.19
-E-CONROY,UsherGC,Age (log Gyr),81,-10.28,-19.45,66.03
-E-CONROY,UsherGC,[Z/H],81,28.47,15.76,54.65
-E-CONROY,DeAngeli_GB,Age (log Gyr),23,-8.59,1.32,34.81
-E-CONROY,DeAngeli_GB,[Z/H],23,22.5,20.42,22.62
-E-CONROY,DeAngeli_HST,Age (log Gyr),36,-15.4,-0.57,37.77
-E-CONROY,DeAngeli_HST,[Z/H],36,42.2,26.05,51.7
+Model,Literature data,Parameter,Sample size,Mean difference(%),Medium difference(%),Standard deviation difference(%)
+Th-MaStar(v0.2) ,UsherGC,Age (log Gyr),81,-16.64,-22.56,53.69
+Th-MaStar(v0.2) ,UsherGC,[Z/H],81,-1.06,-3.71,33.11
+Th-MaStar(v0.2) ,DeAngeli_GB,Age (log Gyr),23,-2.74,-2.17,20.55
+Th-MaStar(v0.2) ,DeAngeli_GB,[Z/H],23,-16.48,-15.76,27.68
+Th-MaStar(v0.2) ,DeAngeli_HST,Age (log Gyr),36,-6.89,-2.29,25.7
+Th-MaStar(v0.2) ,DeAngeli_HST,[Z/H],36,-8.96,-5.59,27.7
+E-MaStar(v0.2) ,UsherGC,Age (log Gyr),81,-22.22,-24.6,51.03
+E-MaStar(v0.2) ,UsherGC,[Z/H],81,4.1,-0.93,53.7
+E-MaStar(v0.2) ,DeAngeli_GB,Age (log Gyr),23,-15.01,-4.79,32.88
+E-MaStar(v0.2) ,DeAngeli_GB,[Z/H],23,-9.05,-17.19,31.7
+E-MaStar(v0.2) ,DeAngeli_HST,Age (log Gyr),36,-18.66,-5.58,35.02
+E-MaStar(v0.2) ,DeAngeli_HST,[Z/H],36,9.05,-3.13,62.77
+E-CONROY,UsherGC,Age (log Gyr),81,-4.89,-16.65,65.76
+E-CONROY,UsherGC,[Z/H],81,30.07,17.11,56.32
+E-CONROY,DeAngeli_GB,Age (log Gyr),23,-4.3,4.62,30.96
+E-CONROY,DeAngeli_GB,[Z/H],23,18.37,11.54,23.9
+E-CONROY,DeAngeli_HST,Age (log Gyr),36,-10.44,2.09,32.78
+E-CONROY,DeAngeli_HST,[Z/H],36,42.48,20.95,56.3

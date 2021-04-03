@@ -3,13 +3,12 @@ import numpy as np
 import os
 
 dissertation_results = False
-MASTAR_VERSION      = "v0.2"
 
 input_file      = [
     #os.path.join(os.getcwd(), "example_data/spec-0266-51602-0001.fits"),
     #os.path.join(os.getcwd(), "usher_r2000/NGC0104_2015-01-30.fits"),
-    #os.path.join(os.getcwd(), "usher_r2000/NGC0330_2015-11-02.fits"),
-    os.path.join(os.getcwd(), "usher_r2000/NGC0121_2015-08-11.fits"),                     
+    os.path.join(os.getcwd(), "usher_r2000/NGC0330_2015-11-02.fits"),
+    #os.path.join(os.getcwd(), "usher_r2000/NGC0121_2015-08-11.fits"),                     
 ]
 
 path = os.path.join(os.getcwd(), "usher_r2000")
@@ -19,10 +18,11 @@ ask_to_override     = False
 write_results       = True
 
 # choose model: 'm11', 'MaStar', 'CONROY'
-model_key = 'CONROY'
-model_lib = ['E-CONROY'] 
-imfs      = ['kr']
-downgrade_to_conroy = True
+model_key           = 'MaStar'
+model_lib           = ['Th-MaStar'] 
+imfs                = ['kr']
+downgrade_to_conroy = False
+MASTAR_VERSION      = "vMPL7"
 
 r_instrument_value = 2000 
 
@@ -73,6 +73,7 @@ max_iterations        = 10
 pdf_sampling          = 300  
 
 ############################################################################################################
+
 """
 if model_key.upper() == "CONROY":
     downgrade_to_conroy = True
