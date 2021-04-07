@@ -58,10 +58,14 @@ for path in paths:
 
 	if "CONROY_E" in path:
 		color = "red"
+		model = "E-CONROY"
+
 	elif "MASTAR_TH" in path:
 		color = "royalblue"
+		model = "Th-MaStar"
 	elif "MASTAR_E" in path:
 		color = "navy"
+		model = "E-MaStar"
 
 	fig = plt.figure(figsize=(20,10))	
 
@@ -74,6 +78,7 @@ for path in paths:
 	metal_array_ = []
 
 	for file in files:
+
 
 		with fits.open(file, memmap=True) as hdul:
 
@@ -98,26 +103,46 @@ for path in paths:
 			for i in csp_light:
 				csp_light_.append(i)
 
+	fig.suptitle("Model " + model + " with associated distributions of Usher et al data")
 
 	alpha = 0.075
 
-	ax1.bar(age_array_, csp_light_, width=0.25, align='center', alpha=alpha, color = color, zorder = 0)
-	ax1.scatter(age_array_, csp_light_, color = 'orange', alpha = alpha, zorder = 1)
+	ax1.bar(age_array_, csp_light_, width=0.25, align='center', alpha=alpha, color = color, zorder = 0, label = 'Age distribution', edgecolor='orange')
+	ax1.scatter(age_array_, csp_light_, color = 'orange', alpha = alpha, zorder = 1, label = 'Age distribution')
 	age_array, csp_light_average = reorder_and_average(age_array_, csp_light_)
-	ax1.plot(age_array, csp_light_average, color = 'black', linewidth = 2, zorder = 2, label = "Average distrubition of age")
+	ax1.plot(age_array, csp_light_average, color = 'black', linewidth = 2, zorder = 2, label = "Average age distribution")
 	ax1.set_xlabel('Lookback time (Gyr)')
 	ax1.set_ylabel('Frequency')
+	#ax1.set_title("Model " + model + " with associated distributions of Usher et al data")
+	leg = ax1.legend()
 
-	ax2.bar(metal_array_, csp_light_, width=0.1, align='center', alpha=alpha, color = color, zorder = 0)
-	ax2.scatter(metal_array_, csp_light_, color = 'orange', alpha = alpha, zorder = 1)
+	for lh in leg.legendHandles: 
+		lh.set_alpha(1)
+
+	ax2.bar(metal_array_, csp_light_, width=0.1, align='center', alpha=alpha, color = color, zorder = 0, label = 'Metallicity distribution', edgecolor='orange')
+	ax2.scatter(metal_array_, csp_light_, color = 'orange', alpha = alpha, zorder = 1, label = 'Metallicity distribution')
 	metal_array, csp_light_average = reorder_and_average(metal_array_, csp_light_)
-	ax2.plot(metal_array, csp_light_average, color = 'black', linewidth = 2, zorder = 2, label = "Average distrubition of metallicity")
+	ax2.plot(metal_array, csp_light_average, color = 'black', linewidth = 2, zorder = 2, label = "Average metallicity distribution")
 	ax2.set_xlabel('[Z/H] (dex)')
-	ax2.set_ylabel('Frequency')
+	ax2.set_yticklabels([])
+	ax2.tick_params(axis = "y", direction = "in")
+	#ax2.set_ylabel('Frequency')
+	leg = ax2.legend()
+	
+	for lh in leg.legendHandles: 
+		lh.set_alpha(1)
 
-	plt.legend()
+	plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+	
+	try:
+		display_plot = sys.argv[1].lower() == 'true'
+	except:
+		display_plot = False
 
-	plt.show()
+	if display_plot:
+		plt.show()
+
+	fig.savefig("output/dissertation/data/look_backtime/" + model + "_lookback_time.png")
 
 
 
