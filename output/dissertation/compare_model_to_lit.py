@@ -31,21 +31,33 @@ if __name__ == "__main__":
 	except:
 		display_plot = False
 
+	try:
+		absolute_value = sys.argv[2].lower() == 'true'
+	except:
+		absolute_value = False
+
+	#light_weight = 0
+	#mass_weight  = 1
+	firefly_values_to_use = 1
+
 	#Setup arrays to store calculated values
 	model_array       = []
 	lit_used_array    = []
 	parameter_array   = []
 	sample_size_array = []
-	mean_array        = []
-	medium_array      = []
-	sigma_array       = []
+	mean_array        = [[], []]
+	medium_array      = [[], []]
+	med_error_array   = [[], []]
+	sigma_array       = [[], []]
 
 	#Paths (relative to firefly directory) to read in the data processed by firefly
 
 	paths = [
-		"output/dissertation/MASTAR_TH_V0.2_KR",
+		"output/dissertation/MASTAR_TH_VMPL7_KR",
+		"output/dissertation/MASTAR_TH_VMPL9_KR",
+
 		#"output/dissertation/MASTAR_TH_V0.2_KR/downgraded",
-		"output/dissertation/MASTAR_E_V0.2_KR",
+		"output/dissertation/MASTAR_E_VMPL7_KR",
 		#"output/dissertation/MASTAR_E_V0.2_KR/downgraded",
 		"output/dissertation/CONROY_E_KR/downgraded",
 	]
@@ -74,10 +86,10 @@ if __name__ == "__main__":
 		#Initialise index for plotting graph
 		index = 1
 
-		if "0.2" in path:
-			version = "(v0.2) "
-		elif "0.3" in path:
-			version = "(v0.3) "
+		if "MPL7" in path:
+			version = "(MPL7)"
+		elif "VMPL9" in path:
+			version = "(VMPL9)"
 		else:
 			version = ""
 
@@ -214,12 +226,36 @@ if __name__ == "__main__":
 			sample_size = len(model_age_array[0])
 
 			#Check the type of model used and assign a colour
-			if "E-CONROY" in model.upper():
+			if "CONROY_E" in path.upper():
 				color = "red"
-			elif "TH-MASTAR" in model.upper():
+				model = "E-Conroy"
+
+			elif "MASTAR_TH" in path.upper():
 				color = "royalblue"
-			elif "E-MASTAR" in model.upper():
-				color = "navy"	
+				model = "Th-MaStar"
+
+				if "VMPL7" in path.upper():
+					model = model + "(MPL7)"
+
+				elif "VMPL9" in path.upper():
+					model = model + "(MPL9)"
+					color = "navy"
+
+				elif "VMPL11" in path.upper():
+					model = model + "(MPL11)"
+
+			elif "MASTAR_E" in path.upper():
+				color = "lime"
+				model = "E-MaStar"	
+
+				if "VMPL7" in path.upper():
+					model = model + "(MPL7)"
+
+				elif "VMPL9" in path.upper():
+					model = model + "(MPL9)"
+
+				if "VMPL11" in path.upper():
+					model = model + "(MPL11)"
 
 			#Convert lists to numpy arrays
 			model_age_array = np.array(model_age_array)
@@ -230,9 +266,13 @@ if __name__ == "__main__":
 			#Setup plotting options
 			columns     = 4
 			rows        = len(lit_files)
-			bins        = 15
-			capsize     = 2
+			capsize     = 3
+			min_bin     = -3
+			max_bin     = 3
+			bin_width    = 0.25
 
+			#bins = np.arange(min_bin, max_bin + bin_width, bin_width)
+			bins = np.linspace(start = min_bin, stop= max_bin, num=26)
 			#Name figure
 			fig.suptitle("Model " + model + " compared with literature values.", fontweight='bold')
 			
@@ -240,11 +280,33 @@ if __name__ == "__main__":
 
 			#Age
 			ax1 = fig.add_subplot(rows, columns, index)
-			ax1.hist(np.array(model_age_array[0]) - lit_age_array, bins = bins, color = color)
+
+			age_difference = np.array(model_age_array[firefly_values_to_use]) - np.array(lit_age_array)
+			if absolute_value:
+				age_difference = np.absolute(age_difference)
+
+			age_difference_lightW = np.array(model_age_array[0]) - np.array(lit_age_array)
+			age_difference_massW  = np.array(model_age_array[1]) - np.array(lit_age_array)
+
+			ax1.hist(age_difference_lightW, bins = bins, color = color, alpha = 0.5, label = "Light weight")
+			ax1.hist(age_difference_lightW, bins = bins, color = color, alpha = 0.75, histtype=u'step', linewidth = 3)
+			ax1.hist(age_difference_massW, bins = bins, color = "black", alpha = 0.5, label = "Mass weight")
+			ax1.hist(age_difference_massW, bins = bins, color = "black", alpha = 0.75, histtype=u'step', linewidth = 3)
 			xabs_max = abs(max(ax1.get_xlim(), key=abs))
-			#ax1.set_xlim(xmin=-xabs_max, xmax=xabs_max)
-			ax1.set_xlim(xmin=-3, xmax=3)
+
+			ax1.set_xlim(xmin=min_bin, xmax=max_bin)
 			ax1.set_ylabel("Frequency")
+			ax1.vlines(0, linestyle = "dashed", ymin=0, ymax=100)
+
+			if index == 1:
+				ax1.legend(framealpha = 0.5)
+
+			if "Usher" in lit_file:
+				ax1.set_ylim(0, 40)
+			elif "DeAngeli_GB" in lit_file:
+				ax1.set_ylim(0, 15)
+			elif "DeAngeli_HST" in lit_file:
+				ax1.set_ylim(0, 20)
 
 			if index > rows*columns -columns: 
 				ax1.set_xlabel("Age (log Gyr) Model - Literature")
@@ -262,42 +324,11 @@ if __name__ == "__main__":
 						 va='center',
 						 fontweight='bold')
 
-			#Metal
-			index = index +1
-			ax2 = fig.add_subplot(rows, columns, index)
-			ax2.hist(np.array(model_metal_array[0]) - np.array(lit_metal_array), bins = bins, color = color)
-			xabs_max = abs(max(ax2.get_xlim(), key=abs))
-			#ax2.set_xlim(xmin=-xabs_max, xmax=xabs_max)
-			ax2.set_xlim(xmin=-3, xmax=3)
-			#ax2.set_xlim(-2.5, 2.5)
-			#ax2.set_ylim(0, 30)
-
-			ax2.set_ylabel("Frequency")
-			if index > rows*columns -columns: 
-				ax2.set_xlabel("[Z/H] Model - Literature")
-			else:
-				ax2.set_xticklabels([])
-				ax2.tick_params(axis = "x", direction = "in")
-
 			#Plot scatter plot data
 			#Age
 			index = index +1
 			ax3 = fig.add_subplot(rows, columns, index)
-			ax3.plot([0, 1], [0, 1], 'g--', transform=ax3.transAxes, color = color)
-
-			#ax3.scatter(lit_age_array, model_age_array, color = color)
-			ax3.errorbar(lit_age_array, 
-						 model_age_array[1], 
-						 yerr = (np.array(model_age_array[1]) - np.array(model_age_low_array[1]), np.array(model_age_up_array[1]) - np.array(model_age_array[1])),
-						 xerr = (lit_age_low_array, lit_age_up_array),
-						 color = 'black', 
-						 fmt='o', 
-						 ecolor='black', 
-						 alpha = 0.75, 
-						 markerfacecolor='none', 
-						 capsize=capsize,
-						 marker = 'v',
-						 label = 'Mass weight')
+			ax3.plot([0, 1], [0, 1], 'g--', transform=ax3.transAxes, color = "black")
 
 			ax3.errorbar(lit_age_array, 
 						 model_age_array[0], 
@@ -306,10 +337,25 @@ if __name__ == "__main__":
 						 color = color, 
 						 fmt='o', 
 						 ecolor=color, 
-						 alpha = 0.75, 
+						 alpha = 0.5, 
 						 markerfacecolor='none', 
 						 capsize=capsize,
-						 label = 'Light weight')
+						 label = 'Light weight',
+						 linewidth = 1)
+
+			ax3.errorbar(lit_age_array, 
+						 model_age_array[1], 
+						 yerr = (np.array(model_age_array[1]) - np.array(model_age_low_array[1]), np.array(model_age_up_array[1]) - np.array(model_age_array[1])),
+						 xerr = (lit_age_low_array, lit_age_up_array),
+						 color = 'black', 
+						 fmt='o', 
+						 ecolor='black', 
+						 alpha = 0.5, 
+						 markerfacecolor='none', 
+						 capsize=capsize,
+						 marker = 'v',
+						 label = 'Mass weight',
+						 linewidth = 1)
 			
 			ax3.set_ylabel("Log Age (Gyr) - Model")
 			ax3.set_xlim(-2, 1.3)
@@ -321,26 +367,52 @@ if __name__ == "__main__":
 				ax3.set_xticklabels([])
 				ax3.tick_params(axis = "x", direction = "in")
 
+			if index == 2:
+				ax3.legend(framealpha= 0.5)
+
+			#Metal
+			index = index +1
+
+			ax2 = fig.add_subplot(rows, columns, index)
+
+			metal_difference = np.array(model_metal_array[firefly_values_to_use]) - np.array(lit_metal_array)
+
+			if absolute_value:
+				metal_difference = np.absolute(metal_difference)
+
+			metal_difference_lightW = np.array(model_metal_array[0]) - np.array(lit_metal_array)
+			metal_difference_massW  = np.array(model_metal_array[1]) - np.array(lit_metal_array)
+
+			ax2.hist(metal_difference_lightW, bins = bins, color = color, alpha = 0.5, label = "Light weight")
+			ax2.hist(metal_difference_lightW, bins = bins, color = color, alpha = 0.75, histtype=u'step', linewidth = 3)
+			ax2.hist(metal_difference_massW, bins = bins, color = "black", alpha = 0.5,label = "Mass weight")
+			ax2.hist(metal_difference_massW, bins = bins, color = "black", alpha = 0.75, histtype=u'step', linewidth = 3)
+			xabs_max = abs(max(ax2.get_xlim(), key=abs))
+			ax2.set_xlim(xmin=-3, xmax=3)
+			ax2.vlines(0, linestyle = "dashed", ymin=0, ymax=100)
+
 			if index == 3:
-				ax3.legend()
+				ax2.legend(framealpha = 0.5)
+
+			ax2.set_ylabel("Frequency")
+			if index > rows*columns -columns: 
+				ax2.set_xlabel("[Z/H] Model - Literature")
+			else:
+				ax2.set_xticklabels([])
+				ax2.tick_params(axis = "x", direction = "in")
+
+			if "Usher" in lit_file:
+				ax2.set_ylim(0, 30)
+			elif "DeAngeli_GB" in lit_file:
+				ax2.set_ylim(0, 12)
+			elif "DeAngeli_HST" in lit_file:
+				ax2.set_ylim(0, 18)
 
 			#Metal
 			index = index +1
 			ax4 = fig.add_subplot(rows, columns, index)
 			#ax4.scatter(lit_metal_array, model_metal_array, color = color)
-			ax4.plot([0, 1], [0, 1], 'g--', transform=ax4.transAxes, color = color)
-			ax4.errorbar(lit_metal_array, 
-						 model_metal_array[1], 
-						 yerr = (np.array(model_metal_array[1]) - np.array(model_metal_low_array[1]), np.array(model_metal_up_array[1]) - np.array(model_metal_array[1])),
-						 xerr = (lit_metal_low_array, lit_metal_up_array),
-						 color = 'black', 
-						 fmt='o', 
-						 ecolor='black', 
-						 alpha = 0.75, 
-						 markerfacecolor='none', 
-						 capsize=capsize,
-						 marker = 'v',
-						 label = 'massW')
+			ax4.plot([0, 1], [0, 1], 'g--', transform=ax4.transAxes, color = "black")
 
 			ax4.errorbar(lit_metal_array, 
 						 model_metal_array[0], 
@@ -349,14 +421,30 @@ if __name__ == "__main__":
 						 color = color, 
 						 fmt='o', 
 						 ecolor=color, 
-						 alpha = 0.75, 
+						 alpha = 0.5, 
 						 markerfacecolor='none', 
 						 capsize=capsize,
-						 label = 'lightW')
+						 label = 'Light weight')
+
+			ax4.errorbar(lit_metal_array, 
+						 model_metal_array[1], 
+						 yerr = (np.array(model_metal_array[1]) - np.array(model_metal_low_array[1]), np.array(model_metal_up_array[1]) - np.array(model_metal_array[1])),
+						 xerr = (lit_metal_low_array, lit_metal_up_array),
+						 color = 'black', 
+						 fmt='o', 
+						 ecolor='black', 
+						 alpha = 0.5, 
+						 markerfacecolor='none', 
+						 capsize=capsize,
+						 marker = 'v',
+						 label = 'Mass weight')
 			
 			ax4.set_ylabel("[Z/H] - Model")
 			ax4.set_xlim(-3, 0.6)
 			ax4.set_ylim(-3, 0.6)
+
+			if index == 4:
+				ax4.legend(framealpha = 0.5)
 
 
 			if index > rows*columns -columns: 
@@ -368,15 +456,26 @@ if __name__ == "__main__":
 			index = index +1
 			
 			#Calculate stats
+			#######################################################################
 
-			mean_age     = np.mean(model_age_array[1] - lit_age_array)
-			mean_metal   = np.mean(model_metal_array[1] - lit_metal_array)
+			#Light weight
 
-			medium_age   = np.median(model_age_array[1] - lit_age_array)
-			medium_metal = np.median(model_metal_array[1] - lit_metal_array)
+			mean_age     = np.mean(age_difference_lightW)
+			mean_metal   = np.mean(metal_difference_lightW)
 
-			std_age      = np.std(model_age_array[1] - lit_age_array)
-			std_metal    = np.std(model_metal_array[1] - lit_metal_array)
+			medium_age   = np.median(age_difference_lightW)
+			medium_metal = np.median(metal_difference_lightW)
+
+			#Medium error
+			age_error_firefly      = np.maximum(model_age_up_array[0], model_age_low_array[0])
+			age_error_literature   = np.maximum(lit_age_up_array, lit_age_low_array) 
+			metal_error_firefly    = np.maximum(model_metal_up_array[0], model_metal_low_array[0])
+			metal_error_literature = np.maximum(lit_metal_up_array, lit_metal_low_array) 
+			med_error_age          = np.sqrt((np.median(age_error_firefly/model_age_array[0]))**2 + (np.median(age_error_literature/lit_age_array))**2) * mean_age
+			med_error_metal        = np.sqrt((np.median(metal_error_firefly/model_metal_array[0]))**2 + (np.median(metal_error_literature/lit_metal_array))**2) * mean_metal
+
+			std_age      = np.std(age_difference_lightW)
+			std_metal    = np.std(metal_difference_lightW)
 
 			#Save data to arrays
 			sample_size_array.append(sample_size)
@@ -393,35 +492,66 @@ if __name__ == "__main__":
 
 			n_decimals= 2
 
-			mean_array.append(round(mean_age*100, n_decimals))
-			mean_array.append(round(mean_metal*100, n_decimals))			
+			mean_array[0].append(round(mean_age, n_decimals))
+			mean_array[0].append(round(mean_metal, n_decimals))			
 
-			medium_array.append(round(medium_age*100, n_decimals))
-			medium_array.append(round(medium_metal*100, n_decimals))
+			medium_array[0].append(round(medium_age, n_decimals))
+			medium_array[0].append(round(medium_metal, n_decimals))
 
-			sigma_array.append(round(std_age*100, n_decimals))
-			sigma_array.append(round(std_metal*100, n_decimals))
+			med_error_array[0].append(abs(round(med_error_age, n_decimals)))
+			med_error_array[0].append(abs(round(med_error_metal, n_decimals)))
 
-			#print("Medium Difference Age (log Gyr) =", medium_age)
-			#print("Medium Difference [Z/H]         =", medium_metal)
+			sigma_array[0].append(round(std_age, n_decimals))
+			sigma_array[0].append(round(std_metal, n_decimals))
 
-			#print("STD Difference Age (log Gyr)    =", std_age)
-			#print("STD Difference [Z/H]            =", std_metal)
+			#########################################################################################
+			#Mass weight
+
+			mean_age     = np.mean(age_difference_massW)
+			mean_metal   = np.mean(metal_difference_massW)
+
+			medium_age   = np.median(age_difference_massW)
+			medium_metal = np.median(metal_difference_massW)
+
+			age_error_firefly      = np.maximum(model_age_up_array[1], model_age_low_array[1])
+			age_error_literature   = np.maximum(lit_age_up_array, lit_age_low_array) 
+			metal_error_firefly    = np.maximum(model_metal_up_array[1], model_metal_low_array[1])
+			metal_error_literature = np.maximum(lit_metal_up_array, lit_metal_low_array) 
+			med_error_age          = np.sqrt((np.median(age_error_firefly/model_age_array[1]))**2 + (np.median(age_error_literature/lit_age_array))**2) * mean_age
+			med_error_metal        = np.sqrt((np.median(metal_error_firefly/model_metal_array[1]))**2 + (np.median(metal_error_literature/lit_metal_array))**2) * mean_metal
+
+			std_age      = np.std(age_difference_massW)
+			std_metal    = np.std(metal_difference_massW)
+
+			mean_array[1].append(round(mean_age, n_decimals))
+			mean_array[1].append(round(mean_metal, n_decimals))			
+
+			medium_array[1].append(round(medium_age, n_decimals))
+			medium_array[1].append(round(medium_metal, n_decimals))
+
+			med_error_array[1].append(abs(round(med_error_age, n_decimals)))
+			med_error_array[1].append(abs(round(med_error_metal, n_decimals)))
+
+			sigma_array[1].append(round(std_age, n_decimals))
+			sigma_array[1].append(round(std_metal, n_decimals))
 
 		fig.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 		#Save plots
-		fig.savefig("output/dissertation/data/" + model + "_comparison_to_lit.png")
+
+		fig.savefig("output/dissertation/data/comparison_to_lit/" + ("absolute/" if absolute_value else "") + model + "_comparison_to_lit" + ("_absolute" if absolute_value else "") + ".png")
 
 		if display_plot:
 			plt.show()
 
 	#Create dataframe and save the stats in a table
-	data = {'Model': model_array, 'Literature data': lit_used_array, 'Parameter':parameter_array, 'Sample size': sample_size_array,'Mean difference(%)': mean_array,'Medium difference(%)': medium_array, 'Standard deviation difference(%)': sigma_array}
-
+	data = {'Model': model_array, 'Literature data': lit_used_array, 'Parameter':parameter_array, 'Sample size': sample_size_array, 'Medium difference': medium_array[0], 'Medium error': med_error_array[0],'Standard deviation difference': sigma_array[0]}
 	df = pd.DataFrame(data=data)
+	df.to_csv("output/dissertation/data/comparison_to_lit/" + ("absolute/" if absolute_value else "") + "table_lightW" + ("_absolute" if absolute_value else "") +".csv", index = False, header=True)
 
-	df.to_csv("output/dissertation/data/table.csv", index = False, header=True)
+	data = {'Model': model_array, 'Literature data': lit_used_array, 'Parameter':parameter_array, 'Sample size': sample_size_array, 'Medium difference': medium_array[1], 'Medium error': med_error_array[1],'Standard deviation difference': sigma_array[1]}
+	df = pd.DataFrame(data=data)
+	df.to_csv("output/dissertation/data/comparison_to_lit/" + ("absolute/" if absolute_value else "") + "table_massW" + ("_absolute" if absolute_value else "") +".csv", index = False, header=True)
 
 	print(df.loc[(df['Literature data'] == 'UsherGC') & (df['Parameter'] == '[Z/H]')], "\n")
 	print(df.loc[(df['Literature data'] == 'UsherGC') & (df['Parameter'] == 'Age (log Gyr)')], "\n")

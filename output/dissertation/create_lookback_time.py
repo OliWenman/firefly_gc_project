@@ -40,9 +40,10 @@ def reorder_and_average(parameter_array, csp_light_array):
 	return parameter_array_sorted_, csp_light_average
 
 paths = [
-	"output/dissertation/MASTAR_TH_V0.2_KR",
+	"output/dissertation/MASTAR_TH_VMPL7_KR",
+	"output/dissertation/MASTAR_TH_VMPL9_KR",
 	#"output/dissertation/MASTAR_TH_V0.2_KR/downgraded",
-	"output/dissertation/MASTAR_E_V0.2_KR",
+	"output/dissertation/MASTAR_E_VMPL7_KR",
 	#"output/dissertation/MASTAR_E_V0.2_KR/downgraded",
 	"output/dissertation/CONROY_E_KR/downgraded",
 ]
@@ -56,16 +57,37 @@ for path in paths:
 	columns = 2
 	index = 1
 
-	if "CONROY_E" in path:
+	#Check the type of model used and assign a colour
+	if "CONROY_E" in path.upper():
 		color = "red"
-		model = "E-CONROY"
+		model = "E-Conroy"
 
-	elif "MASTAR_TH" in path:
+	elif "MASTAR_TH" in path.upper():
 		color = "royalblue"
 		model = "Th-MaStar"
-	elif "MASTAR_E" in path:
-		color = "navy"
-		model = "E-MaStar"
+
+		if "VMPL7" in path.upper():
+			model = model + "(MPL7)"
+
+		elif "VMPL9" in path.upper():
+			model = model + "(MPL9)"
+			color = "navy"
+
+		elif "VMPL11" in path.upper():
+			model = model + "(MPL11)"
+
+	elif "MASTAR_E" in path.upper():
+		color = "lime"
+		model = "E-MaStar"	
+
+		if "VMPL7" in path.upper():
+			model = model + "(MPL7)"
+
+		elif "VMPL9" in path.upper():
+			model = model + "(MPL9)"
+
+		if "VMPL11" in path.upper():
+			model = model + "(MPL11)"
 
 	fig = plt.figure(figsize=(20,10))	
 
@@ -113,6 +135,7 @@ for path in paths:
 	ax1.plot(age_array, csp_light_average, color = 'black', linewidth = 2, zorder = 2, label = "Average age distribution")
 	ax1.set_xlabel('Lookback time (Gyr)')
 	ax1.set_ylabel('Frequency')
+	ax1.set_ylim(0, 1)
 	#ax1.set_title("Model " + model + " with associated distributions of Usher et al data")
 	leg = ax1.legend()
 
@@ -124,6 +147,7 @@ for path in paths:
 	metal_array, csp_light_average = reorder_and_average(metal_array_, csp_light_)
 	ax2.plot(metal_array, csp_light_average, color = 'black', linewidth = 2, zorder = 2, label = "Average metallicity distribution")
 	ax2.set_xlabel('[Z/H] (dex)')
+	ax2.set_ylim(0, 1)
 	ax2.set_yticklabels([])
 	ax2.tick_params(axis = "y", direction = "in")
 	#ax2.set_ylabel('Frequency')

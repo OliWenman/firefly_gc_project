@@ -2,17 +2,17 @@ from astropy.io import fits
 import numpy as np
 import os
 
-dissertation_results = False
-
+dissertation_results = True
+"""
 input_file      = [
     #os.path.join(os.getcwd(), "example_data/spec-0266-51602-0001.fits"),
-    #os.path.join(os.getcwd(), "usher_r2000/NGC0104_2015-01-30.fits"),
-    os.path.join(os.getcwd(), "usher_r2000/NGC0330_2015-11-02.fits"),
+    os.path.join(os.getcwd(), "usher_r2000/NGC0104_2015-01-30.fits"),
+    #os.path.join(os.getcwd(), "usher_r2000/NGC0330_2015-11-02.fits"),
     #os.path.join(os.getcwd(), "usher_r2000/NGC0121_2015-08-11.fits"),                     
 ]
-
+"""
 path = os.path.join(os.getcwd(), "usher_r2000")
-#input_file = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+input_file = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
 
 ask_to_override     = False
 write_results       = True
@@ -22,7 +22,7 @@ model_key           = 'MaStar'
 model_lib           = ['Th-MaStar'] 
 imfs                = ['kr']
 downgrade_to_conroy = False
-MASTAR_VERSION      = "vMPL7"
+MASTAR_VERSION      = "vMPL9"
 
 r_instrument_value = 2000 
 

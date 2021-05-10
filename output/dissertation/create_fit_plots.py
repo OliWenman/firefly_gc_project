@@ -9,9 +9,11 @@ from astropy.io import fits
 from math import floor, ceil
 
 paths = [
-	"output/dissertation/MASTAR_TH_V0.2_KR",
+	"output/dissertation/MASTAR_TH_VMPL7_KR",
+	"output/dissertation/MASTAR_TH_VMPL9_KR",
+	#"output/dissertation/MASTAR_TH_VMPL9_KR"
 	#"output/dissertation/MASTAR_TH_V0.2_KR/downgraded",
-	"output/dissertation/MASTAR_E_V0.2_KR",
+	"output/dissertation/MASTAR_E_VMPL7_KR",
 	#"output/dissertation/MASTAR_E_V0.2_KR/downgraded",
 	"output/dissertation/CONROY_E_KR/downgraded",
 ]
@@ -22,7 +24,7 @@ fontsize   = 6*factor
 loc        = 'upper right' 
 framealpha = 0.5
 
-linewidth   = i_linewidth = linewidth_object = 4
+linewidth   = i_linewidth = linewidth_object = 4.5
 d_linewidth = 1
 
 alpha = 1
@@ -33,6 +35,7 @@ mpl.rcParams['axes.linewidth'] = 2
 rows    = 8
 columns = 11
 
+#################################################
 files_front = 0
 files_end   = int((rows * columns) / 2)
 
@@ -56,7 +59,7 @@ while continue_loop:
 		files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
 
 		if files_end > len(files):
-			files_end = len(files) -1
+			files_end = len(files) 
 			continue_loop = False
 
 		files = files[files_front:files_end]
@@ -138,11 +141,23 @@ while continue_loop:
 
 						model = hdul[1].header['model']
 
+						if "MPL7" in path:
+							version = "(MPL7)"
+						elif "VMPL9" in path:
+							version = "(VMPL9)"
+						else:
+							version = ""
+
+						model = model + version
+
 						#Check the type of model used and assign a colour
 						if "E-CONROY" in model.upper():
 							color = "red"
 						elif "TH-MASTAR" in model.upper():
 							color = "royalblue"
+							if "VMPL9" in model.upper():
+								color = "navy"
+
 						elif "E-MASTAR" in model.upper():
 							color = "lime"	
 
@@ -192,6 +207,9 @@ while continue_loop:
 							color = "red"
 						elif "TH-MASTAR" in model.upper():
 							color = "royalblue"
+							if "VMPL9" in path.upper():
+								color = "navy"
+
 						elif "E-MASTAR" in model.upper():
 							color = "lime"	
 

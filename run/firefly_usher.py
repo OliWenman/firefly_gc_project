@@ -84,6 +84,8 @@ if check_inputs:
 			print("                     ", os.path.basename(file))
 	
 	print("model_lib           =", model_lib)
+	if "MaStar" in model_lib[0]:
+		print("VERSION             =", inp.MASTAR_VERSION) 
 	print("imfs                =", imfs)
 	print("downgrade_to_conroy =", downgrade_to_conroy)
 	print("data_wave_medium    =", data_wave_medium)

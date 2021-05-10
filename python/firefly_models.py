@@ -53,8 +53,6 @@ dict_imfs = {'cha': 'Chabrier', 'ss': 'Salpeter', 'kr': 'Kroupa'}
 
 ver = os.environ['MASTAR_VERSION']
 
-print("HERE", ver)
-
 def trylog10(value):
 	if (value<EPS):
 		logv = default_value
@@ -131,7 +129,9 @@ class StellarPopulationModel:
 				
 		elif self.models =='MaStar':
 			model_path = os.environ['STELLARPOPMODELS_DIR']
+			
 			hdul=pyfits.open(model_path+'/MaStar_SSP_'+ver+'.fits.gz')
+
 			r_model=hdul[2].data[1,:]
 			# This provides R=lamba/delta_lambda as numpy ndarray. The params deltal_libs and deltal should probably be renamed. 
 			#print(r_model)
