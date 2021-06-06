@@ -19,7 +19,7 @@
 !output/dissertation/
 stellar_population_models/SSP_CONROY/
 output/disseration_backup/
-!stellar_population_models/*.fits/
+!stellar_population_models/*.fits.gz/
 
 
 
