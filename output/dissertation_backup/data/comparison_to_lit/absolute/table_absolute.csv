@@ -1,0 +1,25 @@
+Model,Literature data,Parameter,Sample size,Mean difference(%),Medium difference(%),Standard deviation difference(%)
+Th-MaStar(MPL7),UsherGC,Age (log Gyr),81,35.57,26.66,35.03
+Th-MaStar(MPL7),UsherGC,[Z/H],81,29.99,25.99,24.33
+Th-MaStar(MPL7),DeAngeli_GB,Age (log Gyr),23,17.49,13.15,15.62
+Th-MaStar(MPL7),DeAngeli_GB,[Z/H],23,27.06,27.49,20.71
+Th-MaStar(MPL7),DeAngeli_HST,Age (log Gyr),36,20.04,16.41,18.78
+Th-MaStar(MPL7),DeAngeli_HST,[Z/H],36,25.66,18.89,24.54
+Th-MaStar(MPL9),UsherGC,Age (log Gyr),81,39.99,24.16,40.94
+Th-MaStar(MPL9),UsherGC,[Z/H],81,32.53,24.07,28.65
+Th-MaStar(MPL9),DeAngeli_GB,Age (log Gyr),23,21.79,14.43,21.04
+Th-MaStar(MPL9),DeAngeli_GB,[Z/H],23,37.33,26.08,32.53
+Th-MaStar(MPL9),DeAngeli_HST,Age (log Gyr),36,30.94,15.34,44.41
+Th-MaStar(MPL9),DeAngeli_HST,[Z/H],36,31.02,24.25,29.1
+E-MaStar(MPL7),UsherGC,Age (log Gyr),81,42.52,29.97,35.49
+E-MaStar(MPL7),UsherGC,[Z/H],81,34.98,22.96,43.39
+E-MaStar(MPL7),DeAngeli_GB,Age (log Gyr),23,27.97,21.65,25.03
+E-MaStar(MPL7),DeAngeli_GB,[Z/H],23,29.4,27.49,21.3
+E-MaStar(MPL7),DeAngeli_HST,Age (log Gyr),36,28.75,17.89,29.24
+E-MaStar(MPL7),DeAngeli_HST,[Z/H],36,34.96,18.37,52.68
+E-Conroy,UsherGC,Age (log Gyr),81,44.74,26.34,49.64
+E-Conroy,UsherGC,[Z/H],81,40.85,29.54,46.14
+E-Conroy,DeAngeli_GB,Age (log Gyr),23,23.22,12.28,27.32
+E-Conroy,DeAngeli_GB,[Z/H],23,23.94,20.42,21.08
+E-Conroy,DeAngeli_HST,Age (log Gyr),36,26.96,12.95,30.6
+E-Conroy,DeAngeli_HST,[Z/H],36,42.89,26.05,51.13

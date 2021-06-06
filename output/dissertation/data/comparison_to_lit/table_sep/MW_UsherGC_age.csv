@@ -1,0 +1,6 @@
+Model,Literature data,Parameter,Sample size,Medium difference,Medium error,Standard deviation difference
+Th-MaStar(MPL7),UsherGC,Age (log Gyr),81,-0.23,0.17,0.54
+Th-MaStar(MPL9),UsherGC,Age (log Gyr),81,-0.17,0.26,0.51
+Th-MaStar(MPL11),UsherGC,Age (log Gyr),81,-0.21,0.25,0.44
+E-MaStar(MPL7),UsherGC,Age (log Gyr),81,-0.25,0.22,0.51
+Conroy,UsherGC,Age (log Gyr),81,-0.17,0.05,0.66

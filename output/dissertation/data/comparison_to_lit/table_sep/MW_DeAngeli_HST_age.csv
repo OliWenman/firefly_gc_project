@@ -1,0 +1,6 @@
+Model,Literature data,Parameter,Sample size,Medium difference,Medium error,Standard deviation difference
+Th-MaStar(MPL7),DeAngeli_HST,Age (log Gyr),36,-0.02,0.07,0.26
+Th-MaStar(MPL9),DeAngeli_HST,Age (log Gyr),36,-0.08,0.19,0.48
+Th-MaStar(MPL11),DeAngeli_HST,Age (log Gyr),36,-0.04,0.08,0.23
+E-MaStar(MPL7),DeAngeli_HST,Age (log Gyr),36,-0.06,0.19,0.35
+Conroy,DeAngeli_HST,Age (log Gyr),36,0.02,0.1,0.33

@@ -27,8 +27,8 @@ cosmo = co.Planck15
 
 #input file with path to read in wavelength, flux and flux error arrays
 #the example is for an ascii file with extension 'ascii'
-input_file = sys.argv[1]
-#input_file='example_data/spec-0266-51602-0001.fits'
+#input_file = sys.argv[1]
+input_file='example_data/spec-0266-51602-0001.fits'
 hdul = fits.open(input_file)
 suffix = ""		
 
@@ -38,7 +38,8 @@ redshift = hdul[2].data['Z'][0]
 wavelength = 10**hdul[1].data['loglam']
 flux = hdul[1].data['flux']
 error = hdul[1].data['ivar']**(-0.5)
-
+print(flux, "\n")
+print(error)
 # RA and DEC
 ra=hdul[0].header['RA'] ; dec=hdul[0].header['DEC']
 

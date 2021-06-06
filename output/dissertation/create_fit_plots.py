@@ -11,7 +11,7 @@ from math import floor, ceil
 paths = [
 	"output/dissertation/MASTAR_TH_VMPL7_KR",
 	"output/dissertation/MASTAR_TH_VMPL9_KR",
-	#"output/dissertation/MASTAR_TH_VMPL9_KR"
+	"output/dissertation/MASTAR_TH_VMPL11_KR",
 	#"output/dissertation/MASTAR_TH_V0.2_KR/downgraded",
 	"output/dissertation/MASTAR_E_VMPL7_KR",
 	#"output/dissertation/MASTAR_E_V0.2_KR/downgraded",
@@ -19,13 +19,14 @@ paths = [
 ]
 
 #SETTINGS
-factor = 3
-fontsize   = 6*factor
+factor = 1
+#fontsize   = 6*factor
+fontsize   = 11*factor
 loc        = 'upper right' 
 framealpha = 0.5
 
-linewidth   = i_linewidth = linewidth_object = 4.5
-d_linewidth = 1
+linewidth   = i_linewidth = linewidth_object = 4
+d_linewidth = 0.7
 
 alpha = 1
 
@@ -34,6 +35,12 @@ mpl.rcParams['axes.linewidth'] = 2
 
 rows    = 8
 columns = 11
+
+#rows    = 2
+#columns = 4
+
+columns = 2
+rows = 2
 
 #################################################
 files_front = 0
@@ -45,7 +52,9 @@ file_index = 0
 
 while continue_loop:
 
-	fig = plt.figure(figsize=(11.69*factor, 8.27*factor))	
+	#fig = plt.figure(figsize=(11.69*factor, 8.27*factor))	
+	#fig = plt.figure(figsize=(11.69*factor, 7*factor))
+	fig = plt.figure(figsize=(11.69*factor, 7*factor))	
 	file_index = file_index + 1 
 
 	linewidth = i_linewidth
@@ -57,6 +66,24 @@ while continue_loop:
 
 	 	#Get every file in the path of the folder and store in a list
 		files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+		"""
+		files = [
+			os.path.join(path, "spFly-NGC0330_2015-11-02.fits"), 
+			os.path.join(path, "spFly-NGC1846_2016-04-02.fits"),
+			os.path.join(path, "spFly-NGC6528_2015-04-13.fits"),
+			os.path.join(path, "spFly-NGC7099_2016-10-01.fits"),
+		]
+
+		"""
+		files = [
+			#os.path.join(path, "spFly-NGC5634_2015-08-10.fits"), 
+			os.path.join(path, "spFly-NGC5824_2016-04-01.fits"),
+			#os.path.join(path, "spFly-NGC6284_2016-09-29.fits"),
+			#os.path.join(path, "spFly-NGC6352_2015-07-09.fits"),
+			#os.path.join(path, "spFly-NGC6388_2015-04-13.fits"), 
+			os.path.join(path, "spFly-NGC6637_2015-07-09.fits"),
+			#os.path.join(path, "spFly-NGC6809_2015-08-09.fits"),
+		]
 
 		if files_end > len(files):
 			files_end = len(files) 
@@ -107,10 +134,10 @@ while continue_loop:
 			#	print("here")
 
 
-			if index > rows*(columns -columns -1): 
-				ax.set_xlabel("Wavelength(\u03bcm)")
-			else:
-				ax.set_xticklabels([])
+			#if index > rows*(columns -columns -1): 
+			#	ax.set_xlabel("Wavelength(\u03bcm)")
+			#else:
+			#	ax.set_xticklabels([])
 
 
 			if (y % 2) == 0:
@@ -145,6 +172,8 @@ while continue_loop:
 							version = "(MPL7)"
 						elif "VMPL9" in path:
 							version = "(VMPL9)"
+						elif "VMPL11" in path:
+							version = "(VMPL11)"
 						else:
 							version = ""
 
@@ -157,6 +186,8 @@ while continue_loop:
 							color = "royalblue"
 							if "VMPL9" in model.upper():
 								color = "navy"
+							elif "VMPL11" in path.upper():
+								color = "blueviolet"
 
 						elif "E-MASTAR" in model.upper():
 							color = "lime"	
@@ -171,6 +202,7 @@ while continue_loop:
 
 						ax.legend(fontsize=fontsize, loc=loc, framealpha = framealpha)
 						print("Index ", index, x, y)
+						ax.set_xticklabels([])
 						#print(new_index, "P")
 				except(IndexError):
 					print(new_index, x, y, "error - P")
@@ -209,12 +241,18 @@ while continue_loop:
 							color = "royalblue"
 							if "VMPL9" in path.upper():
 								color = "navy"
+							elif "VMPL11" in path.upper():
+								color = "blueviolet"
 
 						elif "E-MASTAR" in model.upper():
 							color = "lime"	
 
 						ax.plot(wave, flux - model_flux, label = model, linewidth = linewidth, alpha = alpha, color = color)
 						#ax.legend(fontsize=fontsize, loc=loc, framealpha = framealpha)
+						ax.set_xlabel("Wavelength(\u03bcm)")
+						#else:
+						
+
 
 						print("Index ", index, x, y)
 					

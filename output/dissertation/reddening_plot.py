@@ -7,6 +7,8 @@ from astropy.io import fits
 import math
 from math import floor, ceil
 
+plt.rcParams.update({'font.size': 18})
+
 if __name__ == "__main__":
 
 	#Get optinal argument to display plots.
@@ -21,6 +23,7 @@ if __name__ == "__main__":
 	paths = [
 		"output/dissertation/MASTAR_TH_VMPL7_KR",
 		"output/dissertation/MASTAR_TH_VMPL9_KR",
+		"output/dissertation/MASTAR_TH_VMPL11_KR",
 		#"output/dissertation/MASTAR_TH_V0.2_KR/downgraded",
 		"output/dissertation/MASTAR_E_VMPL7_KR",
 		#"output/dissertation/MASTAR_E_V0.2_KR/downgraded",
@@ -29,7 +32,7 @@ if __name__ == "__main__":
 
 	factor = 1
 
-	fig   = plt.figure(figsize=(11.69*factor, 8.27*factor))	
+	fig   = plt.figure(figsize=(11.69*factor, 5*factor))	
 	index = 0
 
 	columns = len(paths)
@@ -70,6 +73,7 @@ if __name__ == "__main__":
 
 			elif "VMPL11" in path.upper():
 				model = model + "(MPL11)"
+				color = "blueviolet"
 
 		elif "MASTAR_E" in path.upper():
 			color = "lime"
@@ -117,7 +121,7 @@ if __name__ == "__main__":
 		ax1.legend()
 		ax1.set_xlim(0, 0.35)
 		ax1.set_ylim(0, 70)
-		ax1.set_title("Histogram of Firefly's derived E(B-V) values for 86 local galactic cluster data")
+		#ax1.set_title("Histogram of Firefly's derived E(B-V) values for 86 local galactic cluster data")
 
 		ax1.set_xlabel("E(B-V)")
 		ax1.set_ylabel("Frequency")

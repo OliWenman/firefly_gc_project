@@ -1,0 +1,6 @@
+Model,Literature data,Parameter,Sample size,Medium difference,Medium error,Standard deviation difference
+Th-MaStar(MPL7),DeAngeli_HST,[Z/H],36,0.02,0.09,0.34
+Th-MaStar(MPL9),DeAngeli_HST,[Z/H],36,0.05,0.11,0.41
+Th-MaStar(MPL11),DeAngeli_HST,[Z/H],36,0.05,0.14,0.39
+E-MaStar(MPL7),DeAngeli_HST,[Z/H],36,-0.0,0.11,0.62
+Conroy,DeAngeli_HST,[Z/H],36,0.26,0.43,0.52

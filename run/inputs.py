@@ -2,27 +2,27 @@ from astropy.io import fits
 import numpy as np
 import os
 
-dissertation_results = True
-"""
+dissertation_results = False
+
 input_file      = [
     #os.path.join(os.getcwd(), "example_data/spec-0266-51602-0001.fits"),
     os.path.join(os.getcwd(), "usher_r2000/NGC0104_2015-01-30.fits"),
     #os.path.join(os.getcwd(), "usher_r2000/NGC0330_2015-11-02.fits"),
     #os.path.join(os.getcwd(), "usher_r2000/NGC0121_2015-08-11.fits"),                     
 ]
-"""
+
 path = os.path.join(os.getcwd(), "usher_r2000")
-input_file = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+#input_file = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
 
 ask_to_override     = False
 write_results       = True
 
 # choose model: 'm11', 'MaStar', 'CONROY'
-model_key           = 'MaStar'
-model_lib           = ['Th-MaStar'] 
+model_key           = 'CONROY'
+model_lib           = ['E-CONROY'] 
 imfs                = ['kr']
-downgrade_to_conroy = False
-MASTAR_VERSION      = "vMPL9"
+#downgrade_to_conroy = False
+MASTAR_VERSION      = "vMPL11"
 
 r_instrument_value = 2000 
 
@@ -74,12 +74,12 @@ pdf_sampling          = 300
 
 ############################################################################################################
 
-"""
+
 if model_key.upper() == "CONROY":
     downgrade_to_conroy = True
 else:
     downgrade_to_conroy = False
-"""
+
 directory = model_key
 
 for mod_lib in model_lib:
@@ -131,6 +131,8 @@ def read_usher(input_file):
     wavelength = wavelength.reshape((-1,))
     flux       = flux.reshape((-1,))
     error      = flux.reshape((-1,))
+
+    error = flux - error
 
     redshift = hdul[0].header['redshift']
     ra       = hdul[0].header['ra']

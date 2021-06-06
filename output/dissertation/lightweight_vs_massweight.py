@@ -7,6 +7,18 @@ from astropy.io import fits
 import math
 from math import floor, ceil
 
+SMALL_SIZE = 12
+MEDIUM_SIZE = 14
+BIGGER_SIZE = 16
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
 if __name__ == "__main__":
 
 	#Get optinal argument to display plots.
@@ -21,6 +33,7 @@ if __name__ == "__main__":
 	paths = [
 		"output/dissertation/MASTAR_TH_VMPL7_KR",
 		"output/dissertation/MASTAR_TH_VMPL9_KR",
+		"output/dissertation/MASTAR_TH_VMPL11_KR",
 		#"output/dissertation/MASTAR_TH_V0.2_KR/downgraded",
 		"output/dissertation/MASTAR_E_VMPL7_KR",
 		#"output/dissertation/MASTAR_E_V0.2_KR/downgraded",
@@ -29,7 +42,7 @@ if __name__ == "__main__":
 
 	factor = 1
 
-	fig   = plt.figure(figsize=(11.69*factor, 8.27*factor))	
+	fig   = plt.figure(figsize=(8, 6))	
 	index = 0
 
 	columns = len(paths)
@@ -57,7 +70,7 @@ if __name__ == "__main__":
 		#Check the type of model used and assign a colour
 		if "CONROY_E" in path.upper():
 			color = "red"
-			model = "E-Conroy"
+			model = "Conroy"
 
 		elif "MASTAR_TH" in path.upper():
 			color = "royalblue"
@@ -72,6 +85,7 @@ if __name__ == "__main__":
 
 			elif "VMPL11" in path.upper():
 				model = model + "(MPL11)"
+				color = "blueviolet"
 
 		elif "MASTAR_E" in path.upper():
 			color = "lime"
@@ -113,16 +127,19 @@ if __name__ == "__main__":
 		ax1 = fig.add_subplot(rows, columns, index)
 		ax1.scatter(age_massW_array, age_lightW_array, label = model, color = color, facecolors='none')
 		ax1.plot([0, 1], [0, 1], 'g--', transform=ax1.transAxes, color = color)
-		ax1.set_xlim(-1.5, 1.5)
-		ax1.set_ylim(-1.5, 1.5)
-		ax1.set_aspect('equal')
-		ax1.set_xlabel("Log Age (Gyr) - mass weighted")
-		ax1.set_xticks(np.arange(-1, 2, 1.0))
-		ax1.legend()
+		ax1.set_xlim(-2, 1.5)
+		ax1.set_ylim(-2, 1.5)
+		#ax1.set_aspect('equal')
+		ax1.set_aspect(1 / ax1.get_data_ratio())
+		ax1.set_xlabel("Log Age (Gyr) - MW")
+		ax1.set_xticks(np.arange(-2, 2, 1.0))
+		ax1.legend(prop={'size': 12}, loc = 'lower right')
+		ax1.set_yticks(np.arange(-2, 2, 1.0))
+		ax1.grid()
 
 		if index == 1:
-			ax1.set_ylabel("Log Age (Gyr) - light weighted")
-			ax1.set_yticks(np.arange(-1, 2, 1.0))
+			ax1.set_ylabel("Log Age (Gyr) - LW")
+			
 		else:
 			ax1.set_yticklabels([])
 
@@ -138,17 +155,19 @@ if __name__ == "__main__":
 		ax2.plot([0, 1], [0, 1], 'g--', transform=ax2.transAxes, color = color)
 		ax2.set_xlim(-2.5, 1)
 		ax2.set_ylim(-2.5, 1)
-		ax2.set_aspect('equal')
-		ax2.set_xlabel("[Z/H] - mass weighted")
+		ax2.set_aspect(1 / ax1.get_data_ratio())
+		ax2.set_xlabel("[Z/H] - MW")
 
+		ax2.set_yticks(np.arange(-2, 2, 1.0))
 		if x == 1:
-			ax2.set_ylabel("[Z/H] - light weighted")
-			ax2.set_yticks(np.arange(-2, 2, 1.0))
+			ax2.set_ylabel("[Z/H] - LW")
+			
 		else:
 			ax2.set_yticklabels([])
 
 		ax2.set_xticks(np.arange(-2, 2, 1.0))
-		ax2.legend()
+		ax2.legend(prop={'size': 12}, loc = 'lower right')
+		ax2.grid()
 
 	plt.tight_layout()
 	plt.show()

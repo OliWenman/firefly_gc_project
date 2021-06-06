@@ -51,7 +51,10 @@ default_value = -9999
 EPS = 10.E-10
 dict_imfs = {'cha': 'Chabrier', 'ss': 'Salpeter', 'kr': 'Kroupa'}
 
-ver = os.environ['MASTAR_VERSION']
+try:
+	ver = os.environ['MASTAR_VERSION']
+except:
+	ver = "vMPL7"
 
 def trylog10(value):
 	if (value<EPS):
@@ -827,6 +830,9 @@ class StellarPopulationModel:
 
 						#Get the selected flux in the loop
 						flux = model_table["flux" + str(s + 1)].values
+
+						flux = flux * 3.828 * 10**29
+						print(3.828 * 10**29)
 
 						# converts to air wavelength
 						if self.data_wave_medium == 'vacuum':

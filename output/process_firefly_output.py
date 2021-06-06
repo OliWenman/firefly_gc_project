@@ -173,8 +173,13 @@ def plot_models():
 
 	model_path = os.path.join(os.environ['STELLARPOPMODELS_DIR'],'SPP_CONROY', "E")
 
-	tin      = [11.0, 11.0]
-	Zin      = [-1.0, 0.2]
+	#11.0, 09.0, 07.0, 05.0, 03.0, 01.0
+	#tin = ["11.0", "11.0", "11.0", "11.0", "11.0"]
+	tin = ["11.0", "09.0", "07.0", "05.0", "03.0", "01.0"]
+
+	#-1.5, -1.0, -0.5, 0.0, 0.2
+	#Zin = [-1.5, -1.0, -0.5, 0.0, 0.2, 0.2]
+	Zin  = [-1.5, -1.5, -1.5, -1.5, -1.5, -1.5]
 	#tin = [11.0]
 	#Zin = [0.2]
 
@@ -193,22 +198,22 @@ def plot_models():
 	mastar_wave = []
 	mastar_flux = []
 
-	fig = py.figure(figsize=(12,8))
-	gs  = gridspec.GridSpec(nrows = 2, ncols = 1, figure = fig)
+	fig = py.figure(figsize=(8,6))
+	gs  = gridspec.GridSpec(nrows = len(tin), ncols = 1, figure = fig)
 
 	for index in range(len(con_files)):
 
 		usecols = [0, 74]
 		names   = ["wavelength", "flux1"] 
 
-		model_table = pd.read_table(os.path.join(con_files[index]), 
+		model_table = pd.read_table(os.path.join("./../stellar_population_models/SSP_CONROY/E", con_files[index]), 
 												usecols         = usecols,
 												names           = names,
 												header          = None, 
 												delim_whitespace= True)
 
 		con_wave.append(model_table["wavelength"])
-		con_flux.append(model_table["flux1"]) #* 3.826*10**29)
+		con_flux.append(model_table["flux1"] * 3.826*10**29)
 
 		sin      = 1.3 
 		ver      = "v0.2"
@@ -222,13 +227,14 @@ def plot_models():
 		res      = MaStar_SSP.res(ver) #resolution array
 		fluxgrid = MaStar_SSP.flux(ver,lib) #flux matrix
 
-		flux = MaStar_SSP.inter(t,Z,s,fluxgrid,tin[index],Zin[index],sin)
+		flux = MaStar_SSP.inter(t,Z,s,fluxgrid,float(tin[index]),float(Zin[index]),sin)
 		
-		if index == 0:
-			flux = flux / np.max(flux*2.71)
-		else:
-
-			flux = flux /np.max(flux*5.3)
+		#if index == 0:
+		#	flux = flux / np.max(flux*2.71)
+		#else:
+		#
+		#	flux = flux /np.max(flux*5.3)
+		
 
 		mastar_wave.append(wave)
 		mastar_flux.append(flux)
@@ -244,26 +250,29 @@ def plot_models():
 		"""
 
 		ax  = fig.add_subplot(gs[index, 0])
-		ax.plot(mastar_wave[index], mastar_flux[index], label = "E-MaStar", linewidth=4, color = "navy")
+		ax.plot(mastar_wave[index], mastar_flux[index], label = "E-MaStar", linewidth=1, color = "navy")
 
 		lib      = "Th"
 		fluxgrid = MaStar_SSP.flux(ver,lib)
-		flux     = MaStar_SSP.inter(t,Z,s,fluxgrid,tin[index],Zin[index],sin)
+		flux     = MaStar_SSP.inter(t,Z,s,fluxgrid,float(tin[index]), float(Zin[index]),sin)
 
+		"""
 		if index == 0:
 			flux = flux / np.max(flux*2.71)
 		else:
 
 			flux = flux /np.max(flux*5.3)
+		"""
 
-		ax.plot(wave, flux, label = "Th-MaStar", linewidth=3.5, color = "royalblue")
+		ax.plot(wave, flux, label = "Th-MaStar", linewidth=1, color = "royalblue")
 
 		#ax.set_title("A comparison of Conroy and MaStar models in wavelength coverage\n Models are of age = " + str(tin[index]) + " Gy, [Fe/H] = " + str(Zin[index]) + " dex, IMF = " + str(sin))
-		ax.plot(con_wave[index], con_flux[index], label = "E-Conroy", linewidth=3, color = "red")
-		ax.set_xlabel("Wavelength (Å)")
-		ax.set_ylabel("Flux \n(Arbitrary Units)")
-		ax.set_xlim(con_wave[0][0]-30, 10300)
-		ax.set_yticks([])
+		ax.plot(con_wave[index], con_flux[index], label = "E-Conroy", linewidth=1, color = "red")
+		#ax.set_xlabel("Wavelength (Å)")
+		#ax.set_ylabel("Flux (Solar Luminosity)")
+		#ax.set_xlim(con_wave[0][0]-30, 10300)
+		ax.set_ylim(0, 2.5 * 10 ** 29)
+		#ax.set_yticks([])
 
 		if index == 0:
 			ax.legend(ncol=3)
@@ -280,16 +289,17 @@ if __name__ == "__main__":
 	input_files = [
 		#"C:/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/CONROY_E_KR/downgraded/spFly-NGC0330_2015-11-02.fits",
 		#"C:/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/MASTAR_E_KR/downgraded/spFly-NGC0330_2015-11-02.fits",
-		"C:/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/CONROY_E_KR/downgraded/spFly-NGC0121_2015-08-11.fits",
-		"C:/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/MASTAR_E_KR/downgraded/spFly-NGC0121_2015-08-11.fits",
-		"C:/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/MASTAR_Th_KR/downgraded/spFly-NGC0121_2015-08-11.fits",
+		"C:/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/dissertation/CONROY_E_KR/downgraded/spFly-NGC0121_2015-08-11.fits",
+		"C:/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/dissertation/MASTAR_E_MPL7_KR/spFly-NGC0121_2015-08-11.fits",
+		"C:/Users/User/Documents/University/Fourth_Year/Project/firefly_gc_project/output/dissertation/MASTAR_Th_MPL9_KR/spFly-NGC0121_2015-08-11.fits",
 	]
 
-	#plot_models()
+	plot_models()
 
-	
+	"""
 	create_firefly_plots(input_files, 
 						 verbose = 0, 
 						 save = True,
 						 preview = True)
+	"""
 	
