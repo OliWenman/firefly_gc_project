@@ -19,7 +19,9 @@
 !output/dissertation/
 stellar_population_models/SSP_CONROY/
 output/disseration_backup/
-!stellar_population_models/*.fits.gz/
+!stellar_population_models/MaStar_SSP_vMPL7.fits
+!stellar_population_models/MaStar_SSP_vMPL9.fits
+!stellar_population_models/MaStar_SSP_vMPL11.fits
 
 
 
